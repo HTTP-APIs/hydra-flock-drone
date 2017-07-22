@@ -1,4 +1,5 @@
-"""Generated API Documentation for Drone API using drone_doc_gen.py."""
+"""
+Generated API Documentation for Drone API using drone_doc_gen.py.
 
 doc = {
     "@context": {
@@ -551,3 +552,4 @@ doc = {
         }
     ]
 }
+"""
