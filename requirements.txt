@@ -1,5 +1,4 @@
 -e git://github.com/andrejsab/hydra-py.git#egg=hydra
--e git+git://github.com/HTTP-APIs/hydrus.git#egg=hydrus
 
 aniso8601==1.2.1
 appdirs==1.4.3
@@ -27,3 +26,4 @@ uWSGI==2.0.13.1
 Werkzeug==0.12.2
 rdflib-jsonld==0.4.0
 requests==2.18.1
+blinker==1.4
