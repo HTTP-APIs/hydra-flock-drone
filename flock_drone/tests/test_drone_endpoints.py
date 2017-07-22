@@ -3,15 +3,11 @@
 import unittest
 import requests
 import json
-from mechanics.main import get_drone_default
-from mechanics.main import gen_Command, gen_State, gen_Datastream
+from flock_drone.mechanics.main import get_drone_default
+from flock_drone.mechanics.main import gen_Command, gen_State, gen_Datastream
 
-# FOR OUTSIDE THE CONTAINER
-# DRONE_URL = "http://192.168.99.100:8081/" ## Windows
-# DRONE_URL = "http://localhost:8081/" ##Linux
 
-# FOR INSIDE THE CONTAINER
-DRONE_URL = "http://drone1/"
+DRONE_URL = "http://localhost:8081/"
 
 
 class TestDroneRequests(unittest.TestCase):
