@@ -1,10 +1,10 @@
 """Handle operations related to new commands for the drone."""
 
 from hydra import Resource, SCHEMA
-from mechanics.main import DRONE_URL, DRONE1
-from mechanics.main import RES_DRONE
-from mechanics.main import gen_State
-from mechanics.main import gen_Command
+from flock_drone.mechanics.main import DRONE_URL, DRONE1
+from flock_drone.mechanics.main import RES_DRONE
+from flock_drone.mechanics.main import gen_State
+from flock_drone.mechanics.main import gen_Command
 import json
 
 

@@ -3,25 +3,19 @@ from hydra import Resource, SCHEMA
 from rdflib import Namespace
 import json
 import os
-
-API_NAME = os.environ.get("API_NAME", "api")
+from flock_drone.settings import API_NAME, CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
+from flock_drone.settings import DRONE_URL, CENTRAL_SERVER_URL
+from flock_drone.settings import IRI_CS, IRI_DRONE
 
 global CENTRAL_SERVER, DRONE1, DRONE_URL
-CENTRAL_SERVER = Namespace("http://central_server/serverapi/vocab#")
+CENTRAL_SERVER = Namespace(CENTRAL_SERVER_NAMESPACE)
 # print(CENTRAL_SERVER)
-DRONE1 = Namespace("http://drone1/droneapi/vocab#")
+DRONE1 = Namespace(DRONE_NAMESPACE)
 # print(DRONE1)
-DRONE_URL = "http://drone1"
-CENTRAL_SERVER_URL = "http://central_server"
 
 global RES_CS, RES_DRONE
-the_iri_of_the_resource_cs = "http://central_server/serverapi"
-# print(the_iri_of_the_resource_cs)
-RES_CS = Resource.from_iri(the_iri_of_the_resource_cs)
-
-the_iri_of_the_resource_drone = "http://drone1/droneapi"
-# print(the_iri_of_the_resource_drone)
-RES_DRONE = Resource.from_iri(the_iri_of_the_resource_drone)
+RES_CS = Resource.from_iri(IRI_CS)
+RES_DRONE = Resource.from_iri(IRI_DRONE)
 
 
 # Drone related methods

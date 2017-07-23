@@ -1,7 +1,7 @@
 """Operation related to Drone state POST operations."""
-from mechanics.main import RES_CS, RES_DRONE
-from mechanics.main import CENTRAL_SERVER, CENTRAL_SERVER_URL, DRONE1
-from mechanics.main import get_drone
+from flock_drone.mechanics.main import RES_CS, RES_DRONE
+from flock_drone.mechanics.main import CENTRAL_SERVER, CENTRAL_SERVER_URL, DRONE1
+from flock_drone.mechanics.main import get_drone
 from hydra import SCHEMA, Resource
 
 
