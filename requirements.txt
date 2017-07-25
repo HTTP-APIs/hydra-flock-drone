@@ -1,5 +1,5 @@
 -e git://github.com/andrejsab/hydra-py.git#egg=hydra
-
+-e git://github.com/xadahiya/hydrus.git#egg=hydrus
 aniso8601==1.2.1
 appdirs==1.4.3
 click==6.7

@@ -3,7 +3,7 @@ from hydra import Resource, SCHEMA
 from rdflib import Namespace
 import json
 import os
-from flock_drone.settings import API_NAME, CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
+from flock_drone.settings import CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
 from flock_drone.settings import DRONE_URL, CENTRAL_SERVER_URL
 from flock_drone.settings import IRI_CS, IRI_DRONE
 

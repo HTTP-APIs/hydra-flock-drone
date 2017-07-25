@@ -2,6 +2,7 @@
 
 from hydrus.hydraspec.doc_writer import HydraDoc, HydraClass, HydraClassProp, HydraClassOp
 import json
+from flock_drone.settings import HYDRUS_SERVER_URL
 
 
 def doc_gen(API, BASE_URL):
@@ -105,9 +106,9 @@ def doc_gen(API, BASE_URL):
 
 
 if __name__ == "__main__":
-    dump = json.dumps(doc_gen("droneapi", "http://localhost/").generate(), indent=4, sort_keys=True)
-    doc = '''"""\nGenerated API Documentation for Server API using server_doc_gen.py.\n\ndoc = %s''' % dump
-    doc = doc + '\n"""'
+    dump = json.dumps(doc_gen("api", HYDRUS_SERVER_URL).generate(), indent=4, sort_keys=True)
+    doc = '''"""\nGenerated API Documentation for Server API using server_doc_gen.py."""\n\ndoc = %s''' % dump
+    doc = doc + '\n'
     doc = doc.replace('true', '"true"')
     doc = doc.replace('false', '"false"')
     doc = doc.replace('null', '"null"')
