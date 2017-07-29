@@ -70,6 +70,14 @@ def get_distance_between_coordinates(a,b):
     """Get the distance between two sets of coordinates."""
     return haversine(a,b)
 
+import math
+def deg2num(lat_deg, lon_deg, zoom):
+  lat_rad = math.radians(lat_deg)
+  n = 2.0 ** zoom
+  xtile = int((lon_deg + 180.0) / 360.0 * n)
+  ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
+  return (xtile, ytile)
+
 
 
 if __name__ == "__main__":
@@ -80,3 +88,5 @@ if __name__ == "__main__":
     print("Final Coordinates", b)
     distance_between_coordinates = get_distance_between_coordinates(a,b)
     print("Distance_between_coordinates", distance_between_coordinates)
+    print("\n")
+    print(deg2num(-10.040397656836609, -55.03373871559225, 12))

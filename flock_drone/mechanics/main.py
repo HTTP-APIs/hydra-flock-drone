@@ -52,13 +52,13 @@ def get_drone():
     drone.pop("@id", None)
     drone.pop("@context", None)
     return drone
-
+get_drone()
 
 def get_drone_id():
     """Return current drone id from drone server."""
     drone = get_drone()
     return int(drone["DroneID"])
-# print(get_drone_id())
+print(get_drone_id())
 
 
 def update_drone(drone):
@@ -70,7 +70,7 @@ def update_drone(drone):
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
     return Resource.from_iri(resp['location'])
-# print(update_drone(get_drone_default()))
+print(update_drone(get_drone_default()))
 
 
 # Datastream related methods
