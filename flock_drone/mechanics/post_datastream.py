@@ -15,7 +15,7 @@ def send_datastream(datastream):
     print("Datastream posted successfully.")
     return new_datastream
 
-
-datastream = get_datastream()
-print(datastream)
-print(send_datastream(datastream))
+if __name__ == "__main__":
+    datastream = get_datastream()
+    print(datastream)
+    print(send_datastream(datastream))
