@@ -9,18 +9,16 @@ import math
 
 # earth_radius = 3960.0 ## For miles
 earth_radius = 6371.0 ## For Kilometers
-degrees_to_radians = math.pi/180.0
-radians_to_degrees = 180.0/math.pi
 
 def change_in_latitude(distance):
     """Given a distance north, return the change in latitude."""
-    return (distance/earth_radius)*radians_to_degrees
+    return math.degrees((distance/earth_radius))
 
 def change_in_longitude(latitude, distance):
     """Given a latitude and a distance west, return the change in longitude."""
     # Find the radius of a circle around the earth at given latitude.
-    r = earth_radius*math.cos(latitude*degrees_to_radians)
-    return (distance/r)*radians_to_degrees
+    r = earth_radius*math.cos(math.radians(latitude))
+    return math.degrees((distance/r))
 
 
 # print(change_in_latitude(-1))
@@ -40,7 +38,7 @@ def convert_direction_to_north_or_west(distance_moved, direction):
 
 def gen_new_coordinates_from_change_in_coordinates(old_coordinates, change_in_coordinates):
     """Calculate new coordinates given coordinates(lat,lon) and change_in_coordinates(lat,lon)."""
-    return tuple(map(lambda x, y: x - y, old_coordinates, change_in_coordinates))
+    return tuple(map(lambda x, y: x + y, old_coordinates, change_in_coordinates))
 
 
 def get_new_coordinates(old_coordinates, distance_moved, direction):
@@ -59,7 +57,7 @@ def get_new_coordinates(old_coordinates, distance_moved, direction):
         longitude_change = change_in_longitude(latitude, distance_moved)
         change_in_coordinates = (0, longitude_change)
     else:
-        raise "Not a valid direction of movement! Please use one of  ['N', 'S', 'E', 'W']"
+        raise TypeError("Not a valid direction of movement! Please use one of  ['N', 'S', 'E', 'W']")
 
     return gen_new_coordinates_from_change_in_coordinates(old_coordinates, change_in_coordinates)
 
@@ -70,7 +68,6 @@ def get_distance_between_coordinates(a,b):
     """Get the distance between two sets of coordinates."""
     return haversine(a,b)
 
-import math
 def deg2num(lat_deg, lon_deg, zoom):
   lat_rad = math.radians(lat_deg)
   n = 2.0 ** zoom
@@ -88,5 +85,5 @@ if __name__ == "__main__":
     print("Final Coordinates", b)
     distance_between_coordinates = get_distance_between_coordinates(a,b)
     print("Distance_between_coordinates", distance_between_coordinates)
-    print("\n")
-    print(deg2num(-10.040397656836609, -55.03373871559225, 12))
+    print("\n\n")
+    print(deg2num(-10.040397656836609, -55.03373871559225, 13))

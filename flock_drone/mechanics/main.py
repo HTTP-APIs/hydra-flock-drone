@@ -24,7 +24,7 @@ def get_drone_default():
     drone_default = {
         "@type": "Drone",
         "DroneID": -1000,
-        "name": "Drone1",
+        "name": "Drone 1",
         "model": "xyz",
         "MaxSpeed": 50,
         "Sensor": "Temperature",

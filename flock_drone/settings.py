@@ -6,9 +6,10 @@ db_path = os.path.join(os.path.dirname(__file__), 'database.db')
 DB_URL = 'sqlite:///{}'.format(db_path)
 
 
-global HYDRUS_SERVER_URL, PORT
+global HYDRUS_SERVER_URL, PORT, API_NAME
 HYDRUS_SERVER_URL = "http://localhost:8081/"
 PORT = 8081
+API_NAME = "api"
 
 
 ## Drone configuration
