@@ -24,7 +24,7 @@ def get_drone_default():
     drone_default = {
         "@type": "Drone",
         "DroneID": -1000,
-        "name": "Drone1",
+        "name": "Drone 1",
         "model": "xyz",
         "MaxSpeed": 50,
         "Sensor": "Temperature",
@@ -53,12 +53,10 @@ def get_drone():
     drone.pop("@context", None)
     return drone
 
-
 def get_drone_id():
     """Return current drone id from drone server."""
     drone = get_drone()
     return int(drone["DroneID"])
-# print(get_drone_id())
 
 
 def update_drone(drone):
@@ -70,7 +68,6 @@ def update_drone(drone):
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
     return Resource.from_iri(resp['location'])
-# print(update_drone(get_drone_default()))
 
 
 # Datastream related methods
@@ -84,8 +81,6 @@ def gen_Datastream(temperature, position, drone_id):
     }
 
     return datastream
-# datastream = gen_datastream(100, "0,0", get_drone_id())
-# print(datastream)
 
 
 def update_datastream(datastream):
@@ -96,7 +91,6 @@ def update_datastream(datastream):
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
     return Resource.from_iri(resp['location'])
-# print(update_datastream(datastream))
 
 
 def get_datastream():
@@ -112,7 +106,6 @@ def get_datastream():
     datastream.pop("@id", None)
     return datastream
 
-# print(get_datastream())
 
 
 # Status related methods
@@ -128,8 +121,6 @@ def gen_State(drone_id, battery, direction, position, sensor_status, speed):
         "Speed": speed,
     }
     return state
-# state = gen_state(-1000, "50", "North", "1,1", "Active", 100)
-# print(state)
 
 
 def update_state(state):
@@ -146,7 +137,6 @@ def update_state(state):
     else:
         print("ERROR: DroneID %s not valid." % (state["DroneID"]))
 
-# print(update_state(state))
 
 
 def get_state():
@@ -157,7 +147,6 @@ def get_state():
 
     return drone_state
 
-# print(get_state())
 # Command related methods
 
 
@@ -169,3 +158,16 @@ def gen_Command(drone_id, state):
         "State": state
     }
     return command
+
+if __name__ == "__main__":
+
+    get_drone()
+    print(update_drone(get_drone_default()))
+    # print(get_drone_id())
+    # datastream = gen_datastream(100, "0,0", get_drone_id())
+    # print(update_datastream(datastream))
+    # print(get_datastream())
+    # state = gen_state(-1000, "50", "North", "1,1", "Active", 100)
+    # print(state)
+    # print(update_state(state))
+    # print(get_state())

@@ -1,15 +1,22 @@
 """Initialize drone."""
 from flock_drone.mechanics.main import RES_CS, RES_DRONE
 from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE1
-from hydra import SCHEMA
+from hydra import SCHEMA, Resource
 from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone
 from flock_drone.mechanics.main import gen_Datastream, update_datastream, get_drone_id
+from flock_drone.settings import CENTRAL_SERVER_URL
 
 
 def init_drone_locally():
     """Initialize the drone locally with Negative identifier."""
-    drone = get_drone_default()
-    update_drone(drone)
+    try:
+        get_drone()
+        print("Drone already initialized.")
+    except Exception as e:
+        print(e)
+        drone = get_drone_default()
+        update_drone(drone)
+        print("Drone initalized locally!")
 
 
 def add_drone(drone):
@@ -22,6 +29,19 @@ def add_drone(drone):
     print(drone_id)
     return drone_id
 
+def remove_drone(drone_id):
+    """Remove previous drone object from the central server."""
+    try:
+        i = Resource.from_iri(CENTRAL_SERVER_URL + drone_id)
+        resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction, None)()
+        if resp.status // 100 != 2:
+            return "error deleting <%s>" % i.identifier
+        else:
+            return "successfully deleted <%s>" % i.identifier
+    except Exception as e:
+        print(e)
+        return {404: "Resource with Id %s not found!" % (drone_id,)}
+
 
 def update_drone_id(id_):
     """Update the drone identifier."""
@@ -32,7 +52,7 @@ def update_drone_id(id_):
 
     # Update drone object
     update_drone(drone)
-    print("DroneID updated successfully", id_)
+    print("DroneID updated successfully with id ", id_)
     return None
 
 
@@ -40,11 +60,17 @@ def init_drone():
     """Initialize drone."""
     # Add drone to the central_server and get identifier
     init_drone_locally()
-    print("DRone initialization success")
 
     drone = get_drone()
-    drone.pop("DroneID", None)
-    drone_id = int(add_drone(drone))
+    drone_id = drone.pop("DroneID", None)
+    ## If drone has default negative id initialize else remove old drone and then inintialize.
+    if int(drone_id) == -1000:
+        drone_id = int(add_drone(drone))
+    else:
+        ## Remove old drone
+        res = remove_drone("/api/DroneCollection/"+drone_id)
+        print("Previous drone successfully deleted from the central server.")
+        drone_id = int(add_drone(drone))
 
     # Update the drone on localhost
     update_drone_id(drone_id)

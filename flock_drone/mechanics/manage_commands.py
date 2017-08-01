@@ -16,7 +16,6 @@ def get_command_collection():
 
     body = json.loads(body.decode('utf-8'))
     return body
-# print(get_command_collection())
 
 
 def add_command(command):
@@ -28,7 +27,6 @@ def add_command(command):
     new_command = Resource.from_iri(resp['location'])
     print("Command posted successfully.")
     return new_command
-# print(add_command(command))
 
 
 # NOTE: id_ will be the IRI stored in Drone Collection
@@ -44,8 +42,10 @@ def delete_command(id_):
             return "deleted <%s>" % i.identifier
     except:
         return {404: "Resource with Id %s not found!" % (id_,)}
-# print(delete_command("/api/CommandCollection/175"))
 
-
-state = gen_State(-1000, "50", "North", "1,1", "Active", 100)
-command = gen_Command(123, state)
+if __name__ == "__main__":
+    print(get_command_collection())
+    # state = gen_State(-1000, "50", "North", "1,1", "Active", 100)
+    # command = gen_Command(123, state)
+    # print(add_command(command))
+    # print(delete_command("/api/CommandCollection/175"))

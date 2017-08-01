@@ -26,8 +26,8 @@ def post_drone(id_, drone):
         return {404: "Resource with Id %s not found!" % (id_,)}
 # print(delete_command("/api/CommandCollection/175"))
 
-
-drone = get_drone()
-drone_id, drone = get_drone_iri(drone)
-print(drone_id, drone)
-print(post_drone(drone_id, drone))
+if __name__ == "__main__":
+    drone = get_drone()
+    drone_id, drone = get_drone_iri(drone)
+    print(drone_id, drone)
+    print(post_drone(drone_id, drone))
