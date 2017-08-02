@@ -22,7 +22,7 @@ def doc_gen(API, BASE_URL):
     state.add_supported_prop(HydraClassProp("http://schema.org/geo", "Position", True, False, False))
     state.add_supported_prop(HydraClassProp("http://schema.org/Property", "Direction", True, False, False))
     state.add_supported_prop(HydraClassProp("http://schema.org/fuelCapacity", "Battery", True, True, False))
-    state.add_supported_prop(HydraClassProp("https://schema.org/status", "SensorStatus", True, False, False))
+    state.add_supported_prop(HydraClassProp("https://schema.org/status", "Status", True, False, False))
 
     # Drone Class
     # NOTE: The actual changes to the drone are to be made at the /api/Drone URI.
@@ -74,10 +74,10 @@ def doc_gen(API, BASE_URL):
                                           None,
                                           [{"statusCode": 200, "description": "Command deleted"}]))
 
-    # Data class
-    # NOTE: This is for the Data to be captured/generated. The mechanics module will enter random data and POST it.
+    # Datastream class
+    # NOTE: This is for the Datastream to be captured/generated. The mechanics module will enter random data and POST it.
     # The server will read[GET] the data when it needs it. No need for collections. Only one instance showing current reading of sensor
-    # The URI is /api/Data
+    # The URI is /api/Datastream
     datastream = HydraClass("Datastream", "Datastream", "Class for a data entry from drone sensors", endpoint=True)
     datastream.add_supported_prop(HydraClassProp("http://schema.org/QuantitativeValue", "Temperature", False, False, True))
     datastream.add_supported_prop(HydraClassProp("http://schema.org/identifier", "DroneID", False, False, True))

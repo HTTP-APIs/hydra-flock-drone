@@ -102,3 +102,7 @@ ENV/
 
 hydrus/
 src/
+
+
+# Db files
+*.db

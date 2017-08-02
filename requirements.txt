@@ -1,15 +1,21 @@
--e git://github.com/andrejsab/hydra-py.git#egg=hydra
--e git://github.com/HTTP-APIs/hydrus.git@96fa41c4970893f9bb4f2c91fabad00be9800d18#egg=hydrus
 aniso8601==1.2.1
 appdirs==1.4.3
+blinker==1.4
+certifi==2017.7.27.1
+chardet==3.0.4
 click==6.7
 Flask==0.11
 Flask-Cors==3.0.3
 Flask-RESTful==0.3.6
+haversine==0.4.5
 httplib2==0.10.3
+-e git://github.com/andrejsab/hydra-py.git@ff78005b3ff1902e53b6faacff17498d105cd80a#egg=hydra
+-e git://github.com/HTTP-APIs/hydrus.git@96fa41c4970893f9bb4f2c91fabad00be9800d18#egg=hydrus
+idna==2.5
 isodate==0.5.4
 itsdangerous==0.24
 Jinja2==2.9.6
+lifter==0.4.1
 MarkupSafe==1.0
 packaging==16.8
 persisting-theory==0.2.1
@@ -18,12 +24,12 @@ pyparsing==2.2.0
 python-dateutil==2.6.0
 pytz==2017.2
 rdflib==4.2.2
+rdflib-jsonld==0.4.0
+requests==2.18.1
 six==1.10.0
 SQLAlchemy==1.1.10
 thespian==3.5.2
 uritemplate==3.0.0
+urllib3==1.21.1
 uWSGI==2.0.13.1
 Werkzeug==0.12.2
-rdflib-jsonld==0.4.0
-requests==2.18.1
-blinker==1.4

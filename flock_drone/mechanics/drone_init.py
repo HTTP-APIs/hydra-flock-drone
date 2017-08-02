@@ -2,8 +2,8 @@
 from flock_drone.mechanics.main import RES_CS, RES_DRONE
 from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE1
 from hydra import SCHEMA, Resource
-from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone
-from flock_drone.mechanics.main import gen_Datastream, update_datastream, get_drone_id
+from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_drone_position
+from flock_drone.mechanics.main import gen_Datastream, update_datastream, get_drone_id, get_controller_location
 from flock_drone.settings import CENTRAL_SERVER_URL
 
 
@@ -15,19 +15,28 @@ def init_drone_locally():
     except Exception as e:
         print(e)
         drone = get_drone_default()
+        location = get_controller_location()
+        print(location)
+        drone["DroneState"]["Position"] = location
         update_drone(drone)
         print("Drone initalized locally!")
 
 
 def add_drone(drone):
     """Add the drone object to the central server and return Id."""
-    add_drone_ = RES_CS.find_suitable_operation(
-        SCHEMA.AddAction, CENTRAL_SERVER.Drone)
-    resp, body = add_drone_(drone)
-    assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
-    drone_id = resp['location'].split("/")[-1]
-    print(drone_id)
-    return drone_id
+    try:
+        add_drone_ = RES_CS.find_suitable_operation(
+            SCHEMA.AddAction, CENTRAL_SERVER.Drone)
+        resp, body = add_drone_(drone)
+        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+        drone_id = resp['location'].split("/")[-1]
+        print(drone_id)
+        return drone_id
+    except (ConnectionRefusedError, KeyError) as e:
+        print(e)
+        print("Connection Refused, Please check the central controller.")
+        print("Using default id instead")
+        return -1000
 
 def remove_drone(drone_id):
     """Remove previous drone object from the central server."""
@@ -81,7 +90,7 @@ def init_drone():
 
 def init_datastream_locally():
     """Initialize the datasteam locally."""
-    datastream = gen_Datastream(100, "0,0", get_drone_id())
+    datastream = gen_Datastream("Normal", get_drone_position(), get_drone_id())
     update_datastream(datastream)
     print("Datastream initialized locally")
     return None

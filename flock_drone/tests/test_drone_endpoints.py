@@ -4,7 +4,7 @@ import unittest
 import requests
 import json
 from flock_drone.mechanics.main import get_drone_default
-from flock_drone.mechanics.main import gen_Command, gen_State, gen_Datastream
+from flock_drone.mechanics.main import gen_Command, gen_State, gen_Datastream, ordered
 
 
 DRONE_URL = "http://localhost:8081/"
@@ -83,6 +83,29 @@ class TestDroneRequests(unittest.TestCase):
 
         request_put = requests.put(DRONE_URL + 'api/CommandCollection', data=json.dumps(command))
         assert request_put.status_code == 400
+
+    def test_drone_data(self):
+        """Test if drone data submitted is same as drone received back."""
+        drone = get_drone_default()
+        request_post = requests.post(DRONE_URL + 'api/Drone', data=json.dumps(drone))
+
+        request_get = requests.get(DRONE_URL + 'api/Drone')
+        received_drone = request_get.json()
+        received_drone.pop("@id", None)
+        received_drone.pop("@context", None)
+        assert ordered(drone) == ordered(received_drone)
+
+    def test_datastream_data(self):
+        """Test if datastream data submitted is same as datastream received back."""
+        datastream = gen_Datastream("100", "0,0", "-1000")
+        request_post = requests.post(DRONE_URL + 'api/Datastream', data=json.dumps(datastream))
+
+        request_get = requests.get(DRONE_URL + 'api/Datastream')
+        received_datastream = request_get.json()
+        received_datastream.pop("@id", None)
+        received_datastream.pop("@context", None)
+
+        assert ordered(datastream) == ordered(received_datastream)
 
 
 if __name__ == '__main__':
