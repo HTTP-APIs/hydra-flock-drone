@@ -30,5 +30,6 @@ setup(name='hydra-flock-drone',
                         'uWSGI==2.0.13.1',
                         'Werkzeug==0.12.2',
                         'rdflib-jsonld==0.4.0',
-                        'requests==2.18.1']
+                        'requests==2.18.1',
+                        'haversine==0.45']
 )
