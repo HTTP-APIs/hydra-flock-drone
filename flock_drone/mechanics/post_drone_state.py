@@ -1,4 +1,10 @@
 """Operation related to Drone state POST operations."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, superParentDir)
+
 from flock_drone.mechanics.main import RES_CS, RES_DRONE
 from flock_drone.mechanics.main import CENTRAL_SERVER, CENTRAL_SERVER_URL, DRONE
 from flock_drone.mechanics.main import get_drone

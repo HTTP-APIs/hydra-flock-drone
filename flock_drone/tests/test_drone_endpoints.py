@@ -1,4 +1,9 @@
 """Tests for checking if all the drone endpoints are working properly."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, superParentDir)
 
 import unittest
 import requests
