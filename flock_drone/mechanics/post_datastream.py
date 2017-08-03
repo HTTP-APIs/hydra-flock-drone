@@ -1,6 +1,6 @@
 """Operation related to datastream post operations."""
 from flock_drone.mechanics.main import RES_CS, RES_DRONE
-from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE1
+from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE
 from flock_drone.mechanics.main import get_datastream
 from hydra import SCHEMA, Resource
 

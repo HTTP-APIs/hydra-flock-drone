@@ -1,6 +1,6 @@
 """Initialize drone."""
-from flock_drone.mechanics.main import RES_CS, RES_DRONE
-from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE1
+from flock_drone.mechanics.main import RES_CS
+from flock_drone.mechanics.main import CENTRAL_SERVER
 from hydra import SCHEMA, Resource
 from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_drone_position
 from flock_drone.mechanics.main import gen_Datastream, update_datastream, get_drone_id, get_controller_location

@@ -1,8 +1,6 @@
 from haversine import haversine
 import math
 
-
-
 # Distances are measured in miles/Kilometers.
 # Longitudes and latitudes are measured in degrees.
 # Earth is assumed to be perfectly spherical.

@@ -5,13 +5,11 @@ import json
 import os
 from flock_drone.settings import CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
 from flock_drone.settings import DRONE_URL, CENTRAL_SERVER_URL
-from flock_drone.settings import IRI_CS, IRI_DRONE
+from flock_drone.settings import IRI_CS, IRI_DRONE, DRONE_DEFAULT
 
-global CENTRAL_SERVER, DRONE1, DRONE_URL
+global CENTRAL_SERVER, DRONE
 CENTRAL_SERVER = Namespace(CENTRAL_SERVER_NAMESPACE)
-# print(CENTRAL_SERVER)
-DRONE1 = Namespace(DRONE_NAMESPACE)
-# print(DRONE1)
+DRONE = Namespace(DRONE_NAMESPACE)
 
 global RES_CS, RES_DRONE
 RES_CS = Resource.from_iri(IRI_CS)
@@ -21,26 +19,8 @@ RES_DRONE = Resource.from_iri(IRI_DRONE)
 # Drone related methods
 ## Status [Charging, Low Battery, Scanning, Off]
 def get_drone_default():
-    """Return a default drone object with DroneID -1000 for initialization.
-    Speed and MaxSpeeds are in Km/h"""
-    drone_default = {
-        "@type": "Drone",
-        "DroneID": "-1000",
-        "Name": "Drone 1",
-        "Model": "xyz",
-        "MaxSpeed": "130",
-        "Sensor": "Temperature",
-        "DroneState": {
-            "@type": "State",
-            "Speed": "100",
-            "Position": "0,0",
-            "Battery": "100",
-            "Direction": "N",
-            "Status": "Active",
-        }
-    }
-
-    return drone_default
+    """Return the default drone object from settings."""
+    return DRONE_DEFAULT
 
 
 def get_drone():
@@ -48,7 +28,7 @@ def get_drone():
     try:
         get_drone_ = RES_DRONE.find_suitable_operation(
                     operation_type=None, input_type=None,
-                    output_type=DRONE1.Drone)
+                    output_type=DRONE.Drone)
         resp, body = get_drone_()
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
         drone = json.loads(body.decode('utf-8'))
@@ -89,7 +69,7 @@ def update_drone(drone):
     try:
         update_drone_ = RES_DRONE.find_suitable_operation(
                         operation_type=SCHEMA.UpdateAction,
-                        input_type=DRONE1.Drone)
+                        input_type=DRONE.Drone)
         resp, body = update_drone_(drone)
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
@@ -131,7 +111,7 @@ def update_datastream(datastream):
     """Update the drone datastream on drone server."""
     try:
         update_datastream_ = RES_DRONE.find_suitable_operation(
-            operation_type=SCHEMA.UpdateAction, input_type=DRONE1.Datastream)
+            operation_type=SCHEMA.UpdateAction, input_type=DRONE.Datastream)
         resp, body = update_datastream_(datastream)
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
@@ -145,7 +125,7 @@ def get_datastream():
     try:
 
         get_datastream_ = RES_DRONE.find_suitable_operation(
-            operation_type=None, input_type=None, output_type=DRONE1.Datastream)
+            operation_type=None, input_type=None, output_type=DRONE.Datastream)
         resp, body = get_datastream_()
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
