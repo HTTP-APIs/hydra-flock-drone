@@ -1,8 +1,6 @@
 from haversine import haversine
 import math
 
-
-
 # Distances are measured in miles/Kilometers.
 # Longitudes and latitudes are measured in degrees.
 # Earth is assumed to be perfectly spherical.
@@ -81,7 +79,7 @@ if __name__ == "__main__":
 
     a = (-30.040397656836609, -30.03373871559225) ## (lat,lon)
     print("Initial Coordinates", a)
-    b = get_new_coordinates(a, 500, "S")
+    b = get_new_coordinates(a, 1, "N")
     print("Final Coordinates", b)
     distance_between_coordinates = get_distance_between_coordinates(a,b)
     print("Distance_between_coordinates", distance_between_coordinates)

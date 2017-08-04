@@ -1,7 +1,12 @@
 """Handle operations related to new commands for the drone."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, superParentDir)
 
 from hydra import Resource, SCHEMA
-from flock_drone.mechanics.main import DRONE_URL, DRONE1
+from flock_drone.mechanics.main import DRONE_URL, DRONE
 from flock_drone.mechanics.main import RES_DRONE
 from flock_drone.mechanics.main import gen_State
 from flock_drone.mechanics.main import gen_Command
@@ -10,7 +15,7 @@ import json
 
 def get_command_collection():
     """Get command collection from the drone server."""
-    get_command_collection_ = RES_DRONE.find_suitable_operation(None, None, DRONE1.CommandCollection)
+    get_command_collection_ = RES_DRONE.find_suitable_operation(None, None, DRONE.CommandCollection)
     resp, body = get_command_collection_()
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
@@ -20,7 +25,7 @@ def get_command_collection():
 
 def add_command(command):
     """Add command to drone server."""
-    add_command_ = RES_DRONE.find_suitable_operation(SCHEMA.AddAction, DRONE1.Command)
+    add_command_ = RES_DRONE.find_suitable_operation(SCHEMA.AddAction, DRONE.Command)
     resp, body = add_command_(command)
 
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)

@@ -1,4 +1,8 @@
 """Script for setting up Hydrus with flock_drone API Doc."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, parentDir)
 
 from hydrus.app import app_factory, set_session, set_doc, set_hydrus_server_url
 from hydrus.data import doc_parse
@@ -7,10 +11,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from hydrus.data.db_models import Base
 from flock_drone.settings import DB_URL, PORT, HYDRUS_SERVER_URL, API_NAME
-
-
-import os
 from flock_drone.api_docs.doc import doc
+
 
 # The database connection URL
 # See http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#sqlalchemy.create_engine for more info
