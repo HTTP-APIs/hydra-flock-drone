@@ -79,10 +79,10 @@ def is_valid_location(location, bounds):
 
 def get_random_direction_for_drone():
     """Return a random direction for drone."""
-    return random.choice(["N", "S", "E", "W"])
+    return random.choice("N", "S", "E", "W")
 
 
-def handle_invalid_pos(drone, distance_travelled, bounds):
+def handle_invalid_pos(drone, distance_travelled):
     """Handle invalid position update for drone."""
     direction = get_random_direction_for_drone()
     drone["DroneState"]["Direction"] = direction
@@ -108,7 +108,7 @@ def update_drone_position(drone, distance_travelled, direction):
     if is_valid_location(new_drone_position, DRONE_BOUNDS):
         drone["DroneState"]["Position"] = ",".join(map(str, new_drone_position))
     else:
-        drone = handle_invalid_pos(drone, distance_travelled, DRONE_BOUNDS)
+        drone = handle_invalid_pos(drone, distance_travelled)
     return drone
 
 def handle_drone_position(drone):
@@ -138,30 +138,61 @@ def main():
     drone = get_drone()
 
     ## handle the drone battery change
+    drone_identifier = drone["DroneID"]
     drone = handle_drone_battery(drone)
+    drone_battery = drone["DroneState"]["Battery"]
+    drone_direction = drone["DroneState"]["Direction"]
+
     ## Handle drone position change
     drone = handle_drone_position(drone)
-    print("Drone battery", drone["DroneState"]["Battery"])
-    print("Drone position", drone["DroneState"]["Position"])
+
+    if(drone["DroneState"]["Direction"] != drone_direction):
+        ## Generate and send DroneLog
+        dronelog = gen_DroneLog("Drone %s" %(str(drone_identifier),), "changed direction to %s" %(str(drone["DroneState"]["Direction"])))
+        send_dronelog(dronelog)
+        ## Generate and send HttpApiLog
+        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"PUT DroneLog", "Controller")
+        send_http_api_log(http_api_log)
 
     ## Update the drone at central contoller.
-    drone_identifier = drone["DroneID"]
-    ## Send Drone log
-    dronelog = gen_DroneLog("Drone %s" %(str(drone_identifier),), "Battery level %s" %(str(drone["DroneState"]["Battery"])))
-    send_dronelog(dronelog)
+
+    ## Send Drone battery and Http Api logs
+    if int(drone_battery == 20):
+        ## Generate and send DroneLog
+        dronelog = gen_DroneLog("Drone %s" %(str(drone_identifier),), "battery Low %s" %(str(drone["DroneState"]["Battery"])))
+        send_dronelog(dronelog)
+        ## Generate and send HttpApiLog
+        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"PUT DroneLog", "Controller")
+        send_http_api_log(http_api_log)
+
+    elif int(drone_battery == 4):
+        ## Generate and send DroneLog
+        dronelog = gen_DroneLog("Drone %s" %(str(drone_identifier)), "Battery level critical, will shutdown soon!")
+        send_dronelog(dronelog)
+        ## Generate and send HttpApiLog
+        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"PUT DroneLog", "Controller")
+        send_http_api_log(http_api_log)
 
 
     if int(drone_identifier) != -1000:
         update_drone_at_controller(drone, drone_identifier)
+        ## Generate and send HttpApiLog
+        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"POST Drone", "Controller")
+        send_http_api_log(http_api_log)
     ## update the drone locally
     update_drone(drone)
+    ## Generate and send HttpApiLog
+    http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"POST DroneState", "Localhost")
+    send_http_api_log(http_api_log)
+
 
 
     ## Handle sensor datastream
     datastream = gen_Datastream(gen_random_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
     if int(drone_identifier != -1000):
         send_datastream(datastream)
-        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"POST Datastream", "Controller")
+        ## Generate and send HttpApiLog
+        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"PUT Datastream", "Controller")
         send_http_api_log(http_api_log)
     update_datastream(datastream)
 
