@@ -79,10 +79,10 @@ def is_valid_location(location, bounds):
 
 def get_random_direction_for_drone():
     """Return a random direction for drone."""
-    return random.choice("N", "S", "E", "W")
+    return random.choice(["N", "S", "E", "W"])
 
 
-def handle_invalid_pos(drone, distance_travelled):
+def handle_invalid_pos(drone, distance_travelled, bounds):
     """Handle invalid position update for drone."""
     direction = get_random_direction_for_drone()
     drone["DroneState"]["Direction"] = direction
@@ -108,7 +108,7 @@ def update_drone_position(drone, distance_travelled, direction):
     if is_valid_location(new_drone_position, DRONE_BOUNDS):
         drone["DroneState"]["Position"] = ",".join(map(str, new_drone_position))
     else:
-        drone = handle_invalid_pos(drone, distance_travelled)
+        drone = handle_invalid_pos(drone, distance_travelled, DRONE_BOUNDS)
     return drone
 
 def handle_drone_position(drone):
