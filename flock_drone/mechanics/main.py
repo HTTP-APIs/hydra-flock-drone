@@ -111,6 +111,15 @@ def gen_Datastream(temperature, position, drone_id):
 
     return datastream
 
+def gen_Anomaly(location):
+    """Generate an anomaly object."""
+    anomaly = {
+        "@type": "Anomaly",
+
+    }
+
+    return anomaly
+
 
 def update_datastream(datastream):
     """Update the drone datastream on drone server."""
@@ -195,6 +204,26 @@ def gen_Command(drone_id, state):
     }
     return command
 
+## Logs related Functions
+def gen_DroneLog(drone_id, log_string):
+    """Generate a Drone log object from log string."""
+    dronelog = {
+        "@type":"DroneLog",
+        "DroneID":drone_id,
+        "LogString":log_string
+    }
+    return dronelog
+
+
+def gen_HttpApiLog(source, action, target):
+    """Generate a Http Api Log object from action and target."""
+    httpapilog = {
+        "@type":"HttpApiLog",
+        "Subject":source,
+        "Predicate":action,
+        "Object": target
+    }
+    return httpapilog
 
 
 ## Some general Functions
