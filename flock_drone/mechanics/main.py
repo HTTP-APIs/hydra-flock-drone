@@ -111,6 +111,15 @@ def gen_Datastream(temperature, position, drone_id):
 
     return datastream
 
+def gen_Anomaly(location):
+    """Generate an anomaly object."""
+    anomaly = {
+        "@type": "Anomaly",
+
+    }
+
+    return anomaly
+
 
 def update_datastream(datastream):
     """Update the drone datastream on drone server."""

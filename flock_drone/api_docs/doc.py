@@ -52,9 +52,9 @@ doc = {
     "possibleStatus": [],
     "supportedClass": [
         {
-            "@id": "vocab:Drone",
+            "@id": "vocab:Datastream",
             "@type": "hydra:Class",
-            "description": "Class for a drone",
+            "description": "Class for a data entry from drone sensors",
             "supportedOperation": [
                 {
                     "@type": "hydra:Operation",
@@ -62,70 +62,38 @@ doc = {
                     "method": "GET",
                     "possibleStatus": [
                         {
-                            "description": "Drone not found",
+                            "description": "Datastream not found",
                             "statusCode": 404
                         },
                         {
-                            "description": "Drone returned",
+                            "description": "Datastream returned",
                             "statusCode": 200
                         }
                     ],
-                    "returns": "vocab:Drone",
-                    "title": "GetDrone"
+                    "returns": "vocab:Datastream",
+                    "title": "GetDatastream"
                 },
                 {
                     "@type": "http://schema.org/UpdateAction",
-                    "expects": "vocab:Drone",
+                    "expects": "vocab:Datastream",
                     "method": "POST",
                     "possibleStatus": [
                         {
-                            "description": "Drone updated",
+                            "description": "Datastream updated",
                             "statusCode": 200
                         }
                     ],
                     "returns": "null",
-                    "title": "UpdateDrone"
+                    "title": "UpdateDatastream"
                 }
             ],
             "supportedProperty": [
                 {
                     "@type": "SupportedProperty",
-                    "property": "vocab:State",
+                    "property": "http://schema.org/QuantitativeValue",
                     "readonly": "false",
                     "required": "true",
-                    "title": "DroneState",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/name",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "name",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/model",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "model",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://auto.schema.org/speed",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "MaxSpeed",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/device",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "Sensor",
+                    "title": "Temperature",
                     "writeonly": "false"
                 },
                 {
@@ -135,9 +103,17 @@ doc = {
                     "required": "true",
                     "title": "DroneID",
                     "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/geo",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "Position",
+                    "writeonly": "false"
                 }
             ],
-            "title": "Drone"
+            "title": "Datastream"
         },
         {
             "@id": "vocab:State",
@@ -258,9 +234,9 @@ doc = {
             "title": "Command"
         },
         {
-            "@id": "vocab:Datastream",
+            "@id": "vocab:Drone",
             "@type": "hydra:Class",
-            "description": "Class for a data entry from drone sensors",
+            "description": "Class for a drone",
             "supportedOperation": [
                 {
                     "@type": "hydra:Operation",
@@ -268,38 +244,70 @@ doc = {
                     "method": "GET",
                     "possibleStatus": [
                         {
-                            "description": "Datastream not found",
+                            "description": "Drone not found",
                             "statusCode": 404
                         },
                         {
-                            "description": "Datastream returned",
+                            "description": "Drone returned",
                             "statusCode": 200
                         }
                     ],
-                    "returns": "vocab:Datastream",
-                    "title": "GetDatastream"
+                    "returns": "vocab:Drone",
+                    "title": "GetDrone"
                 },
                 {
                     "@type": "http://schema.org/UpdateAction",
-                    "expects": "vocab:Datastream",
+                    "expects": "vocab:Drone",
                     "method": "POST",
                     "possibleStatus": [
                         {
-                            "description": "Datastream updated",
+                            "description": "Drone updated",
                             "statusCode": 200
                         }
                     ],
                     "returns": "null",
-                    "title": "UpdateDatastream"
+                    "title": "UpdateDrone"
                 }
             ],
             "supportedProperty": [
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://schema.org/QuantitativeValue",
+                    "property": "vocab:State",
                     "readonly": "false",
                     "required": "true",
-                    "title": "Temperature",
+                    "title": "DroneState",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/name",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "name",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/model",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "model",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://auto.schema.org/speed",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "MaxSpeed",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/device",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "Sensor",
                     "writeonly": "false"
                 },
                 {
@@ -309,17 +317,9 @@ doc = {
                     "required": "true",
                     "title": "DroneID",
                     "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/geo",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "Position",
-                    "writeonly": "false"
                 }
             ],
-            "title": "Datastream"
+            "title": "Drone"
         },
         {
             "@id": "http://www.w3.org/ns/hydra/core#Collection",
@@ -406,57 +406,6 @@ doc = {
             ],
             "supportedProperty": [
                 {
-                    "hydra:description": "The Drone Class",
-                    "hydra:title": "drone",
-                    "property": {
-                        "@id": "vocab:EntryPoint/Drone",
-                        "@type": "hydra:Link",
-                        "description": "Class for a drone",
-                        "domain": "vocab:EntryPoint",
-                        "label": "Drone",
-                        "range": "vocab:Drone",
-                        "supportedOperation": [
-                            {
-                                "@id": "_:getdrone",
-                                "@type": "hydra:Operation",
-                                "description": "null",
-                                "expects": "null",
-                                "label": "GetDrone",
-                                "method": "GET",
-                                "returns": "vocab:Drone",
-                                "statusCodes": [
-                                    {
-                                        "description": "Drone not found",
-                                        "statusCode": 404
-                                    },
-                                    {
-                                        "description": "Drone returned",
-                                        "statusCode": 200
-                                    }
-                                ]
-                            },
-                            {
-                                "@id": "_:updatedrone",
-                                "@type": "hydra:Operation",
-                                "description": "null",
-                                "expects": "vocab:Drone",
-                                "label": "UpdateDrone",
-                                "method": "POST",
-                                "returns": "null",
-                                "statusCodes": [
-                                    {
-                                        "description": "Drone updated",
-                                        "statusCode": 200
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    "readonly": "true",
-                    "required": "null",
-                    "writeonly": "false"
-                },
-                {
                     "hydra:description": "The Datastream Class",
                     "hydra:title": "datastream",
                     "property": {
@@ -497,6 +446,57 @@ doc = {
                                 "statusCodes": [
                                     {
                                         "description": "Datastream updated",
+                                        "statusCode": 200
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "readonly": "true",
+                    "required": "null",
+                    "writeonly": "false"
+                },
+                {
+                    "hydra:description": "The Drone Class",
+                    "hydra:title": "drone",
+                    "property": {
+                        "@id": "vocab:EntryPoint/Drone",
+                        "@type": "hydra:Link",
+                        "description": "Class for a drone",
+                        "domain": "vocab:EntryPoint",
+                        "label": "Drone",
+                        "range": "vocab:Drone",
+                        "supportedOperation": [
+                            {
+                                "@id": "_:getdrone",
+                                "@type": "hydra:Operation",
+                                "description": "null",
+                                "expects": "null",
+                                "label": "GetDrone",
+                                "method": "GET",
+                                "returns": "vocab:Drone",
+                                "statusCodes": [
+                                    {
+                                        "description": "Drone not found",
+                                        "statusCode": 404
+                                    },
+                                    {
+                                        "description": "Drone returned",
+                                        "statusCode": 200
+                                    }
+                                ]
+                            },
+                            {
+                                "@id": "_:updatedrone",
+                                "@type": "hydra:Operation",
+                                "description": "null",
+                                "expects": "vocab:Drone",
+                                "label": "UpdateDrone",
+                                "method": "POST",
+                                "returns": "null",
+                                "statusCodes": [
+                                    {
+                                        "description": "Drone updated",
                                         "statusCode": 200
                                     }
                                 ]

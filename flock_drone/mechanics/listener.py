@@ -5,27 +5,26 @@ superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will 
 sys.path.insert(0, superParentDir)
 
 import threading
-import json
-from flock_drone.mechanics.manage_commands import get_command_collection
+import random
+# from flock_drone.mechanics.manage_commands import get_command_collection
 from flock_drone.mechanics.main import get_drone, update_drone
 from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits
 from flock_drone.mechanics.main import update_drone_at_controller
-from flock_drone.mechanics.main import gen_Datastream, update_datastream
+from flock_drone.mechanics.main import gen_Datastream, update_datastream, gen_Anomaly
 from flock_drone.mechanics.post_datastream import send_datastream
 from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog, get_controller_location
 from flock_drone.mechanics.post_logs import send_dronelog, send_http_api_log
-import random, math
 
-## Drone main Loop time settings
-global LOOP_TIME
+# Drone main Loop time settings
+global LOOP_TIME, ITERATOR
 LOOP_TIME = 15
 
 CONTROLLER_LOC = tuple(float(x) for x in get_controller_location().split(","))
 
 DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
 
-
-## Battery related functions
+ITERATOR = 0
+# Battery related functions
 def discharge_drone_battery(drone):
     """Handle drone battery discharging."""
     battery_level = drone["DroneState"]["Battery"]
@@ -37,20 +36,23 @@ def discharge_drone_battery(drone):
 
     return drone
 
+
 def charge_drone_battery(drone):
     """Handle the drone battery charging operration."""
     battery_level = drone["DroneState"]["Battery"]
     if int(battery_level) < 95:
-        ## Increase battery level
+        # Increase battery level
         drone["DroneState"]["Battery"] = int(battery_level) + 5
     else:
-        ## If battery >= 95 set battery level to 100%
+        # If battery >= 95 set battery level to 100%
         drone["DroneState"]["Battery"] = 100
     return drone
+
 
 def is_drone_charging(drone):
     """Check if the drone status is charging."""
     return drone["DroneState"]["Status"] == "Charging"
+
 
 def drone_is_not_off(drone):
     """Check if drone status is not off."""
@@ -67,15 +69,14 @@ def handle_drone_battery(drone):
     return drone
 
 
-
-## Distance related functions
-
+# Distance related functions
 def is_valid_location(location, bounds):
     """Check if location is in drone bounds."""
     if min(bounds[0]) <= location[0] <= max(bounds[0]):
         if min(bounds[1]) <= location[1] <= max(bounds[1]):
             return True
     return False
+
 
 def get_random_direction_for_drone():
     """Return a random direction for drone."""
@@ -96,10 +97,10 @@ def handle_invalid_pos(drone, distance_travelled, bounds):
         return handle_invalid_pos(drone, distance_travelled)
 
 
-
 def calculate_dis_travelled(speed, time):
-    """Calculate the distance travelled(in Km) in a give amount of time(s)"""
+    """Calculate the distance travelled(in Km) in a give amount of time(s)."""
     return (speed*time)/3600.0
+
 
 def update_drone_position(drone, distance_travelled, direction):
     """Update the drone position given the distance travelled and direction of travel."""
@@ -110,6 +111,7 @@ def update_drone_position(drone, distance_travelled, direction):
     else:
         drone = handle_invalid_pos(drone, distance_travelled, DRONE_BOUNDS)
     return drone
+
 
 def handle_drone_position(drone):
     """Handle the drone position changes."""
@@ -123,50 +125,59 @@ def handle_drone_position(drone):
     return drone
 
 
-
-## Datastream related functions
+# Datastream related functions
 def gen_random_sensor_data():
     """Generate random sensor data for drone datastream."""
     drone_sensor_options = ["Normal", "Critical", "High"]
     return random.choice(drone_sensor_options)
 
 
+def gen_random_anomaly(drone):
+    """Generates an anomaly at random."""
+    option = random.choice([True, False])
+    if option:
+        anomaly = gen_Anomaly(drone["DroneState"]["Position"])
+
 
 
 def main():
-    """ The main 15 second time loop for drone."""
+    """15 second time loop for drone."""
+    global ITERATOR
+    ITERATOR += 1
+    if ITERATOR % 10 == 0:
+        gen_random_anomaly()
+
     drone = get_drone()
 
-    ## handle the drone battery change
+    # handle the drone battery change
     drone = handle_drone_battery(drone)
-    ## Handle drone position change
+    # Handle drone position change
     drone = handle_drone_position(drone)
     print("Drone battery", drone["DroneState"]["Battery"])
     print("Drone position", drone["DroneState"]["Position"])
 
-    ## Update the drone at central contoller.
+    # Update the drone at central contoller.
     drone_identifier = drone["DroneID"]
-    ## Send Drone log
-    dronelog = gen_DroneLog("Drone %s" %(str(drone_identifier),), "Battery level %s" %(str(drone["DroneState"]["Battery"])))
+    # Send Drone log
+    dronelog = gen_DroneLog("Drone %s" % (str(drone_identifier),), "Battery level %s" % (str(drone["DroneState"]["Battery"])))
     send_dronelog(dronelog)
-
 
     if int(drone_identifier) != -1000:
         update_drone_at_controller(drone, drone_identifier)
-    ## update the drone locally
+    # update the drone locally
     update_drone(drone)
 
-
-    ## Handle sensor datastream
+    # Handle sensor datastream
     datastream = gen_Datastream(gen_random_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
     if int(drone_identifier != -1000):
         send_datastream(datastream)
-        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"POST Datastream", "Controller")
+        http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "POST Datastream", "Controller")
         send_http_api_log(http_api_log)
     update_datastream(datastream)
 
     # call main() again in 60 LOOP_TIME
     threading.Timer(LOOP_TIME, main).start()
+
 
 if __name__ == "__main__":
     main()
