@@ -1,10 +1,6 @@
 """Handle main configuration for the drone."""
-import os, sys
-curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
-sys.path.insert(0, superParentDir)
-
+import os
+import sys
 from hydra import Resource, SCHEMA
 from rdflib import Namespace
 import json
@@ -22,7 +18,7 @@ RES_DRONE = Resource.from_iri(IRI_DRONE)
 
 
 # Drone related methods
-## Status [Charging, Low Battery, Scanning, Off]
+# Status [Charging, Low Battery, Scanning, Off, Anomaly, Confirming]
 def get_drone_default():
     """Return the default drone object from settings."""
     return DRONE_DEFAULT
@@ -30,25 +26,22 @@ def get_drone_default():
 
 def get_drone():
     """Get the drone object from drone server."""
-    try:
-        get_drone_ = RES_DRONE.find_suitable_operation(
-                    operation_type=None, input_type=None,
-                    output_type=DRONE.Drone)
-        resp, body = get_drone_()
-        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
-        drone = json.loads(body.decode('utf-8'))
-        drone.pop("@id", None)
-        drone.pop("@context", None)
-        return drone
-    except ConnectionRefusedError:
-        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+    get_drone_ = RES_DRONE.find_suitable_operation(operation_type=None, input_type=None,
+                                                   output_type=DRONE.Drone)
+    resp, body = get_drone_()
+    assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+    drone = json.loads(body.decode('utf-8'))
+    drone.pop("@id", None)
+    drone.pop("@context", None)
+    return drone
+
 
 def get_controller_location():
     """Get the controller location from central server."""
     try:
-        get_controller_location_ = RES_CS.find_suitable_operation(
-                    operation_type=None, input_type=None,
-                    output_type=CENTRAL_SERVER.Location)
+        get_controller_location_ = RES_CS.find_suitable_operation(operation_type=None,
+                                                                  input_type=None,
+                                                                  output_type=CENTRAL_SERVER.Location)
         resp, body = get_controller_location_()
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
         location_obj = json.loads(body.decode('utf-8'))
@@ -58,10 +51,12 @@ def get_controller_location():
         print("Failed to use controller location, returning default")
         return "0,0"
 
+
 def get_drone_id():
     """Return current drone id from drone server."""
     drone = get_drone()
     return int(drone["DroneID"])
+
 
 def get_drone_position():
     """Return the drone position."""
@@ -72,9 +67,8 @@ def get_drone_position():
 def update_drone(drone):
     """Update the drone object on drone server."""
     try:
-        update_drone_ = RES_DRONE.find_suitable_operation(
-                        operation_type=SCHEMA.UpdateAction,
-                        input_type=DRONE.Drone)
+        update_drone_ = RES_DRONE.find_suitable_operation(operation_type=SCHEMA.UpdateAction,
+                                                          input_type=DRONE.Drone)
         resp, body = update_drone_(drone)
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
@@ -89,7 +83,7 @@ def update_drone_at_controller(drone, drone_identifier):
     try:
         i = Resource.from_iri(CENTRAL_SERVER_URL + id_)
         # name = i.value(SCHEMA.name)
-        resp, _ = i.find_suitable_operation(operation_type =SCHEMA.UpdateAction,
+        resp, _ = i.find_suitable_operation(operation_type=SCHEMA.UpdateAction,
                                             input_type=CENTRAL_SERVER.Drone)(drone)
         if resp.status // 100 != 2:
             return "error updating <%s>" % i.identifier
@@ -111,11 +105,12 @@ def gen_Datastream(temperature, position, drone_id):
 
     return datastream
 
+
 def gen_Anomaly(location):
     """Generate an anomaly object."""
     anomaly = {
         "@type": "Anomaly",
-
+        "Location": location
     }
 
     return anomaly
@@ -152,7 +147,6 @@ def get_datastream():
         raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
 
 
-
 # Status related methods
 def gen_State(drone_id, battery, direction, position, sensor_status, speed):
     """Generate a State objects."""
@@ -183,7 +177,6 @@ def update_state(state):
         print("ERROR: DroneID %s not valid." % (state["DroneID"]))
 
 
-
 def get_state():
     """Get the current drone state from the drone server."""
     drone = get_drone()
@@ -204,13 +197,14 @@ def gen_Command(drone_id, state):
     }
     return command
 
-## Logs related Functions
+
+# Logs related Functions
 def gen_DroneLog(drone_id, log_string):
     """Generate a Drone log object from log string."""
     dronelog = {
-        "@type":"DroneLog",
-        "DroneID":drone_id,
-        "LogString":log_string
+        "@type": "DroneLog",
+        "DroneID": drone_id,
+        "LogString": log_string
     }
     return dronelog
 
@@ -218,15 +212,15 @@ def gen_DroneLog(drone_id, log_string):
 def gen_HttpApiLog(source, action, target):
     """Generate a Http Api Log object from action and target."""
     httpapilog = {
-        "@type":"HttpApiLog",
-        "Subject":source,
-        "Predicate":action,
+        "@type": "HttpApiLog",
+        "Subject": source,
+        "Predicate": action,
         "Object": target
     }
     return httpapilog
 
 
-## Some general Functions
+# Some general Functions
 def ordered(obj):
     """Sort json dicts and lists within"""
     if isinstance(obj, dict):

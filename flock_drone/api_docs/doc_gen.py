@@ -1,13 +1,6 @@
 """API Doc generator for the drone side API."""
 import os
 import sys
-curDir = os.path.dirname(__file__)
-# this will return parent directory.
-parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
-# this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
-sys.path.insert(0, superParentDir)
-
 import json
 from flock_drone.settings import HYDRUS_SERVER_URL
 from hydrus.hydraspec.doc_writer import HydraDoc, HydraClass, HydraClassProp, HydraClassOp
@@ -125,13 +118,13 @@ def doc_gen(API, BASE_URL):
 
 
 if __name__ == "__main__":
-    dump = json.dumps(
-        doc_gen("api", HYDRUS_SERVER_URL).generate(), indent=4, sort_keys=True)
+    dump = json.dumps(doc_gen("api", HYDRUS_SERVER_URL).generate(),
+                      indent=4, sort_keys=True)
     doc = '''"""\nGenerated API Documentation for Server API using server_doc_gen.py."""\n\ndoc = %s''' % dump
     doc = doc + '\n'
     doc = doc.replace('true', '"true"')
     doc = doc.replace('false', '"false"')
     doc = doc.replace('null', '"null"')
-    f = open(os.path.join(os.path.dirname(__file__),"doc.py"), "w")
+    f = open(os.path.join(os.path.dirname(__file__), "doc.py"), "w")
     f.write(doc)
     f.close()

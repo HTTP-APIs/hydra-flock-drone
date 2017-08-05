@@ -1,9 +1,3 @@
-import os, sys
-curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
-sys.path.insert(0, superParentDir)
-
 import threading
 import random
 # from flock_drone.mechanics.manage_commands import get_command_collection
@@ -24,6 +18,8 @@ CONTROLLER_LOC = tuple(float(x) for x in get_controller_location().split(","))
 DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
 
 ITERATOR = 0
+
+
 # Battery related functions
 def discharge_drone_battery(drone):
     """Handle drone battery discharging."""
