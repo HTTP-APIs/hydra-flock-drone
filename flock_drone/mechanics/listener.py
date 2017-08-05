@@ -79,7 +79,7 @@ def is_valid_location(location, bounds):
 
 def get_random_direction_for_drone():
     """Return a random direction for drone."""
-    return random.choice("N", "S", "E", "W")
+    return random.choice(["N", "S", "E", "W"])
 
 
 def handle_invalid_pos(drone, distance_travelled):
