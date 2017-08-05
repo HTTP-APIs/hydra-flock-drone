@@ -59,6 +59,20 @@ def get_new_coordinates(old_coordinates, distance_moved, direction):
 
     return gen_new_coordinates_from_change_in_coordinates(old_coordinates, change_in_coordinates)
 
+def gen_square_path(controller_coordinates, area_of_interest_square_dim):
+    """Generate square path for area of interest."""
+    path = list()
+    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "W"), area_of_interest_square_dim, "S"))
+    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "W"), area_of_interest_square_dim, "N"))
+    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "E"), area_of_interest_square_dim, "N"))
+    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "E"), area_of_interest_square_dim, "S"))
+
+    return path
+
+def gen_drone_pos_limits(square_path):
+    """Generate position bounds for drones."""
+    return ([square_path[0][0], square_path[1][0]], [square_path[1][1], square_path[2][1]])
+
 
 
 
@@ -85,3 +99,5 @@ if __name__ == "__main__":
     print("Distance_between_coordinates", distance_between_coordinates)
     print("\n\n")
     print(deg2num(-10.040397656836609, -55.03373871559225, 13))
+
+    print(gen_drone_pos_limits(gen_square_path(a, 10)))

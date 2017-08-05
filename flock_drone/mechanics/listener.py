@@ -8,17 +8,22 @@ import threading
 import json
 from flock_drone.mechanics.manage_commands import get_command_collection
 from flock_drone.mechanics.main import get_drone, update_drone
-from flock_drone.mechanics.distance import get_new_coordinates
+from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits
 from flock_drone.mechanics.main import update_drone_at_controller
 from flock_drone.mechanics.main import gen_Datastream, update_datastream
 from flock_drone.mechanics.post_datastream import send_datastream
-from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog
+from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog, get_controller_location
 from flock_drone.mechanics.post_logs import send_dronelog, send_http_api_log
-import random
+import random, math
 
 ## Drone main Loop time settings
 global LOOP_TIME
 LOOP_TIME = 15
+
+CONTROLLER_LOC = tuple(float(x) for x in get_controller_location().split(","))
+
+DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
+
 
 ## Battery related functions
 def discharge_drone_battery(drone):
@@ -64,6 +69,34 @@ def handle_drone_battery(drone):
 
 
 ## Distance related functions
+
+def is_valid_location(location, bounds):
+    """Check if location is in drone bounds."""
+    if min(bounds[0]) <= location[0] <= max(bounds[0]):
+        if min(bounds[1]) <= location[1] <= max(bounds[1]):
+            return True
+    return False
+
+def get_random_direction_for_drone():
+    """Return a random direction for drone."""
+    return random.choice("N", "S", "E", "W")
+
+
+def handle_invalid_pos(drone, distance_travelled):
+    """Handle invalid position update for drone."""
+    direction = get_random_direction_for_drone()
+    drone["DroneState"]["Direction"] = direction
+
+    drone_position = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
+    new_drone_position = get_new_coordinates(drone_position, distance_travelled, direction)
+    if is_valid_location(new_drone_position, DRONE_BOUNDS):
+        drone["DroneState"]["Position"] = ",".join(map(str, new_drone_position))
+        return drone
+    else:
+        return handle_invalid_pos(drone, distance_travelled)
+
+
+
 def calculate_dis_travelled(speed, time):
     """Calculate the distance travelled(in Km) in a give amount of time(s)"""
     return (speed*time)/3600.0
@@ -72,7 +105,10 @@ def update_drone_position(drone, distance_travelled, direction):
     """Update the drone position given the distance travelled and direction of travel."""
     drone_position = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
     new_drone_position = get_new_coordinates(drone_position, distance_travelled, direction)
-    drone["DroneState"]["Position"] = ",".join(map(str, new_drone_position))
+    if is_valid_location(new_drone_position, DRONE_BOUNDS):
+        drone["DroneState"]["Position"] = ",".join(map(str, new_drone_position))
+    else:
+        drone = handle_invalid_pos(drone, distance_travelled)
     return drone
 
 def handle_drone_position(drone):
