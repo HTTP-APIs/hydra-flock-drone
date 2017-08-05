@@ -7,7 +7,7 @@ sys.path.insert(0, superParentDir)
 
 from flock_drone.mechanics.main import RES_CS, RES_DRONE
 from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE
-from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog
+from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog, get_drone_id
 from hydra import SCHEMA, Resource
 
 
@@ -32,7 +32,7 @@ def send_http_api_log(http_api_log):
     return new_http_api_log
 
 if __name__ == "__main__":
-    dronelog = gen_DroneLog("upated position")
+    dronelog = gen_DroneLog("Drone %s" %(str(get_drone_id)), "upated position")
     print(send_dronelog(dronelog))
-    http_api_log = gen_HttpApiLog("GET", "Controller Location")
+    http_api_log = gen_HttpApiLog("Drone %s" %(str(get_drone_id)), "GET Location", "Controller")
     print(send_http_api_log(http_api_log))

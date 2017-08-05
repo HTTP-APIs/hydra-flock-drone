@@ -12,6 +12,8 @@ from flock_drone.mechanics.distance import get_new_coordinates
 from flock_drone.mechanics.main import update_drone_at_controller
 from flock_drone.mechanics.main import gen_Datastream, update_datastream
 from flock_drone.mechanics.post_datastream import send_datastream
+from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog
+from flock_drone.mechanics.post_logs import send_dronelog, send_http_api_log
 import random
 
 ## Drone main Loop time settings
@@ -108,15 +110,23 @@ def main():
 
     ## Update the drone at central contoller.
     drone_identifier = drone["DroneID"]
+    ## Send Drone log
+    dronelog = gen_DroneLog("Drone %s" %(str(drone_identifier),), "Battery level %s" %(str(drone["DroneState"]["Battery"])))
+    send_dronelog(dronelog)
+
+
     if int(drone_identifier) != -1000:
         update_drone_at_controller(drone, drone_identifier)
     ## update the drone locally
     update_drone(drone)
 
+
     ## Handle sensor datastream
     datastream = gen_Datastream(gen_random_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
     if int(drone_identifier != -1000):
         send_datastream(datastream)
+        http_api_log = gen_HttpApiLog("Drone %s" %(str(drone_identifier)),"POST Datastream", "Controller")
+        send_http_api_log(http_api_log)
     update_datastream(datastream)
 
     # call main() again in 60 LOOP_TIME
