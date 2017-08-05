@@ -195,6 +195,26 @@ def gen_Command(drone_id, state):
     }
     return command
 
+## Logs related Functions
+def gen_DroneLog(log_string):
+    """Generate a Drone log object from log string."""
+    dronelog = {
+        "@type":"DroneLog",
+        "DroneID":get_drone_id(),
+        "LogString":log_string
+    }
+    return dronelog
+
+
+def gen_HttpApiLog(action, target):
+    """Generate a Http Api Log object from action and target."""
+    httpapilog = {
+        "@type":"HttpApiLog",
+        "Subject":get_drone_id(),
+        "Predicate":action,
+        "Object": target
+    }
+    return httpapilog
 
 
 ## Some general Functions
