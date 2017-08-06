@@ -1,14 +1,29 @@
 """Operation related to datastream post operations."""
-import os, sys
-curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
-sys.path.insert(0, superParentDir)
-
-from flock_drone.mechanics.main import RES_CS, RES_DRONE
-from flock_drone.mechanics.main import CENTRAL_SERVER, DRONE
-from flock_drone.mechanics.main import gen_DroneLog, gen_HttpApiLog, get_drone_id
+from flock_drone.mechanics.main import RES_CS
+from flock_drone.mechanics.main import CENTRAL_SERVER
+from flock_drone.mechanics.main import get_drone
 from hydra import SCHEMA, Resource
+
+
+def gen_DroneLog(drone_id, log_string):
+    """Generate a Drone log object from log string."""
+    dronelog = {
+        "@type": "DroneLog",
+        "DroneID": drone_id,
+        "LogString": log_string
+    }
+    return dronelog
+
+
+def gen_HttpApiLog(source, action, target):
+    """Generate a Http Api Log object from action and target."""
+    httpapilog = {
+        "@type": "HttpApiLog",
+        "Subject": source,
+        "Predicate": action,
+        "Object": target
+    }
+    return httpapilog
 
 
 def send_dronelog(dronelog):
@@ -21,6 +36,7 @@ def send_dronelog(dronelog):
     print("Drone Log successfully.")
     return new_dronelog
 
+
 def send_http_api_log(http_api_log):
     """Post the drone http Api Log to the central server."""
     post_http_api_log = RES_CS.find_suitable_operation(SCHEMA.AddAction, CENTRAL_SERVER.HttpApiLog)
@@ -31,8 +47,10 @@ def send_http_api_log(http_api_log):
     print("Http Api Log posted successfully.")
     return new_http_api_log
 
+
 if __name__ == "__main__":
-    dronelog = gen_DroneLog("Drone %s" %(str(get_drone_id)), "upated position")
+    drone_id = get_drone()["DroneID"]
+    dronelog = gen_DroneLog("Drone %s" % (str(drone_id)), "upated position")
     print(send_dronelog(dronelog))
-    http_api_log = gen_HttpApiLog("Drone %s" %(str(get_drone_id)), "GET Location", "Controller")
+    http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_id)), "GET Location", "Controller")
     print(send_http_api_log(http_api_log))

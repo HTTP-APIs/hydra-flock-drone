@@ -1,16 +1,20 @@
 """Handle operations related to new commands for the drone."""
-import os, sys
-curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
-sys.path.insert(0, superParentDir)
-
+import json
+import re
 from hydra import Resource, SCHEMA
+
 from flock_drone.mechanics.main import DRONE_URL, DRONE
 from flock_drone.mechanics.main import RES_DRONE
-from flock_drone.mechanics.main import gen_State
-from flock_drone.mechanics.main import gen_Command
-import json
+
+
+def gen_Command(drone_id, state):
+    """Create a command entity."""
+    command = {
+        "@type": "Command",
+        "DroneID": drone_id,
+        "State": state
+    }
+    return command
 
 
 def get_command_collection():
@@ -34,11 +38,28 @@ def add_command(command):
     return new_command
 
 
-# NOTE: id_ will be the IRI stored in Drone Collection
+def get_command(at_id):
+    """Get the command using @id."""
+    regex = r'/(.*)/(\d)'
+    matchObj = re.match(regex, at_id)
+    if matchObj:
+        id_ = matchObj.group(2)
+        try:
+            i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
+            # name = i.value(SCHEMA.name)
+            resp, body = i.find_suitable_operation(operation_type=None, input_type=None,
+                                                   output_type=DRONE.Command)()
+            assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+            body = json.loads(body.decode('utf-8'))
+            return body
+        except:
+            return {404: "Resource with Id %s not found!" % (id_,)}
+
+
 def delete_command(id_):
     """Delete a command from the collection given command @id attribute."""
     try:
-        i = Resource.from_iri(DRONE_URL + id_)
+        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
         # name = i.value(SCHEMA.name)
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction)()
         if resp.status // 100 != 2:
@@ -47,6 +68,7 @@ def delete_command(id_):
             return "deleted <%s>" % i.identifier
     except:
         return {404: "Resource with Id %s not found!" % (id_,)}
+
 
 if __name__ == "__main__":
     print(get_command_collection())

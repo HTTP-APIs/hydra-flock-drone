@@ -2,8 +2,8 @@
 from flock_drone.mechanics.main import RES_CS
 from flock_drone.mechanics.main import CENTRAL_SERVER
 from hydra import SCHEMA, Resource
-from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_drone_position
-from flock_drone.mechanics.main import gen_Datastream, update_datastream, get_drone_id, get_controller_location
+from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone
+from flock_drone.mechanics.datastream import gen_Datastream, update_datastream
 from flock_drone.settings import CENTRAL_SERVER_URL
 
 
@@ -38,10 +38,11 @@ def add_drone(drone):
         print("Using default id instead")
         return -1000
 
+
 def remove_drone(drone_id):
     """Remove previous drone object from the central server."""
     try:
-        i = Resource.from_iri(CENTRAL_SERVER_URL + drone_id)
+        i = Resource.from_iri(CENTRAL_SERVER_URL + "/api/DroneCollection" + drone_id)
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction, None)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier
@@ -62,7 +63,6 @@ def update_drone_id(id_):
     # Update drone object
     update_drone(drone)
     print("DroneID updated successfully with id ", id_)
-    return None
 
 
 def init_drone():
@@ -72,12 +72,12 @@ def init_drone():
 
     drone = get_drone()
     drone_id = drone.pop("DroneID", None)
-    ## If drone has default negative id initialize else remove old drone and then inintialize.
+    # If drone has default negative id initialize else remove old drone and then inintialize.
     if int(drone_id) == -1000:
         drone_id = int(add_drone(drone))
     else:
-        ## Remove old drone
-        res = remove_drone("/api/DroneCollection/"+drone_id)
+        # Remove old drone
+        remove_drone(drone_id)
         print("Previous drone successfully deleted from the central server.")
         drone_id = int(add_drone(drone))
 
@@ -85,15 +85,16 @@ def init_drone():
     update_drone_id(drone_id)
 
     print("Drone initialized successfully!")
-    return None
 
 
 def init_datastream_locally():
     """Initialize the datasteam locally."""
-    datastream = gen_Datastream("Normal", get_drone_position(), get_drone_id())
+    drone = get_drone()
+    id_ = drone["DroneID"]
+    position = drone["Position"]
+    datastream = gen_Datastream("Normal", position, id_)
     update_datastream(datastream)
     print("Datastream initialized locally")
-    return None
 
 
 if __name__ == "__main__":

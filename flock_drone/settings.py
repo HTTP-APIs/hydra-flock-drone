@@ -1,18 +1,19 @@
+"""Settings for the drone."""
 import os
 
-## Using sqlite as database
+# Database connector
 global DB_URL
 db_path = os.path.join(os.path.dirname(__file__), 'database.db')
 DB_URL = 'sqlite:///{}'.format(db_path)
 
-
+# Server URL, PORT and entrypoint
 global HYDRUS_SERVER_URL, PORT, API_NAME
 HYDRUS_SERVER_URL = "http://localhost:8081/"
 PORT = 8081
 API_NAME = "api"
 
 
-## Drone configuration
+# Drone configuration
 global CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
 CENTRAL_SERVER_NAMESPACE = "http://localhost:8080/api/vocab#"
 DRONE_NAMESPACE = "http://localhost:8081/api/vocab#"
