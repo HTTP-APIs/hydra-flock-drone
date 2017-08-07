@@ -1,6 +1,7 @@
 """Main control loop for drone."""
 import threading
 import random
+import re
 from flock_drone.mechanics.main import (get_drone, update_drone,
                                         get_controller_location,
                                         update_drone_at_controller)
@@ -11,6 +12,7 @@ from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream, send_datastream
 from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly
 from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits
+from flock_drone.mechanics.commands import get_command_collection, get_command, delete_commands
 
 # Drone main Loop time settings
 global LOOP_TIME, ITERATOR
@@ -21,6 +23,36 @@ CONTROLLER_LOC = tuple(float(x) for x in get_controller_location().split(","))
 DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
 
 ITERATOR = 0
+
+
+def handle_drone_commands(drone):
+    """Handle the commands on the drone server and update drone accordingly."""
+    # Using the latest command, not following previously stored ones, server will ensure order
+    commands = get_command_collection()["members"]
+    command_ids = [x["@id"] for x in commands]
+    temp_list = list()
+    for id_ in command_ids:
+        regex = r'/(.*)/(\d)'
+        matchObj = re.match(regex, id_)
+        if matchObj:
+            temp_list.append(matchObj.group(2))
+    temp_list.sort()
+
+    latest_command = get_command(temp_list[-1])
+    # Execute the latest command
+    drone = execute_command(latest_command, drone)
+    # Delete after execution
+    delete_commands(temp_list)
+
+    return drone
+
+
+def execute_command(command, drone):
+    """Execute the command on the drone."""
+    if command["DroneID"] == drone["DroneID"]:
+        drone["DroneState"] = command["State"]
+
+    return drone
 
 
 # Battery related functions
@@ -151,9 +183,15 @@ def handle_drone_position(drone):
 
 
 def gen_normal_sensor_data():
-    """Generate random sensor data for drone datastream."""
+    """Generate normal sensor data for drone datastream."""
     normal_range = range(25, 40)
     return random.choice(normal_range)
+
+
+def gen_abnormal_sensor_data():
+    """Generate abnormal sensor data for drone datastream."""
+    abnormal_range = range(45, 60)
+    return random.choice(abnormal_range)
 
 
 def gen_random_anomaly(drone):
@@ -163,7 +201,6 @@ def gen_random_anomaly(drone):
     # 1/3 chance of anomaly every ten iterations
     if ITERATOR % 10 == 0:
         ITERATOR = 0
-        gen_random_anomaly()
         option = random.choice([False, True, False])
         if option:
             anomaly = gen_Anomaly(drone["DroneState"]["Position"])
@@ -174,29 +211,26 @@ def gen_random_anomaly(drone):
 def main():
     """15 second time loop for drone."""
     drone = get_drone()
+    drone_identifier = drone["DroneID"]
 
     # Handle positions and battery change
     drone = handle_drone_battery(drone)
     drone = handle_drone_position(drone)
-
-    drone_identifier = drone["DroneID"]
+    drone = handle_drone_commands(drone)
 
     anomaly = gen_random_anomaly()
     if anomaly is not None:
         send_anomaly(anomaly)
-
-    if int(drone_identifier) != -1000:
-        update_drone_at_controller(drone, drone_identifier)
-
-    # update the drone locally
-    update_drone(drone)
-    # Generate and send HttpApiLog
-
-    # Handle sensor datastream
-    if int(drone_identifier != -1000):
+        datastream = gen_Datastream(gen_abnormal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
+    else:
         datastream = gen_Datastream(gen_normal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
-        send_datastream(datastream)
-        update_datastream(datastream)
+
+    # update the drone both locally and on the controller
+    update_drone(drone)
+    update_drone_at_controller(drone, drone_identifier)
+
+    send_datastream(datastream)
+    update_datastream(datastream)
 
     # call main() again in LOOP_TIME
     threading.Timer(LOOP_TIME, main).start()

@@ -1,10 +1,8 @@
 """Handle operations related to new commands for the drone."""
 import json
-import re
 from hydra import Resource, SCHEMA
 
-from flock_drone.mechanics.main import DRONE_URL, DRONE
-from flock_drone.mechanics.main import RES_DRONE
+from flock_drone.mechanics.main import DRONE_URL, DRONE, RES_DRONE
 
 
 def gen_Command(drone_id, state):
@@ -38,22 +36,18 @@ def add_command(command):
     return new_command
 
 
-def get_command(at_id):
+def get_command(id_):
     """Get the command using @id."""
-    regex = r'/(.*)/(\d)'
-    matchObj = re.match(regex, at_id)
-    if matchObj:
-        id_ = matchObj.group(2)
-        try:
-            i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
-            # name = i.value(SCHEMA.name)
-            resp, body = i.find_suitable_operation(operation_type=None, input_type=None,
-                                                   output_type=DRONE.Command)()
-            assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
-            body = json.loads(body.decode('utf-8'))
-            return body
-        except:
-            return {404: "Resource with Id %s not found!" % (id_,)}
+    try:
+        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
+        # name = i.value(SCHEMA.name)
+        resp, body = i.find_suitable_operation(operation_type=None, input_type=None,
+                                               output_type=DRONE.Command)()
+        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+        body = json.loads(body.decode('utf-8'))
+        return body
+    except:
+        return {404: "Resource with Id %s not found!" % (id_,)}
 
 
 def delete_command(id_):
@@ -68,6 +62,12 @@ def delete_command(id_):
             return "deleted <%s>" % i.identifier
     except:
         return {404: "Resource with Id %s not found!" % (id_,)}
+
+
+def delete_commands(command_ids):
+    """Delete a list of commands."""
+    for id_ in command_ids:
+        delete_command(id_)
 
 
 if __name__ == "__main__":

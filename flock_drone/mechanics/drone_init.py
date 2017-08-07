@@ -2,7 +2,7 @@
 from flock_drone.mechanics.main import RES_CS
 from flock_drone.mechanics.main import CENTRAL_SERVER
 from hydra import SCHEMA, Resource
-from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone
+from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_controller_location
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream
 from flock_drone.settings import CENTRAL_SERVER_URL
 
