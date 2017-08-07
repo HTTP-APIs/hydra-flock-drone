@@ -10,7 +10,7 @@ from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
                                         gen_DroneLog, gen_HttpApiLog)
 
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream, send_datastream
-from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly
+from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly, get_anomaly, get_new_state
 from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits
 from flock_drone.mechanics.commands import get_command_collection, get_command, delete_commands
 
@@ -126,6 +126,11 @@ def is_valid_location(location, bounds):
     return False
 
 
+def is_confirming(drone):
+    """Check if the drone is in confirmation state."""
+    return drone["DroneState"]["Status"] == "Confirming"
+
+
 def get_random_direction_for_drone():
     """Return a random direction for drone."""
     return random.choice(["N", "S", "E", "W"])
@@ -208,29 +213,42 @@ def gen_random_anomaly(drone):
     return None
 
 
+def handle_anomaly(drone):
+    """Handle the anomaly that the drone needs to check on."""
+    anomaly = get_anomaly()
+    drone_state = get_new_state(anomaly, drone)
+    drone["DroneState"] = drone_state
+    return drone
+
+
 def main():
     """15 second time loop for drone."""
     drone = get_drone()
     drone_identifier = drone["DroneID"]
+    datastream = None
+
+    if is_confirming(drone):
+        drone = handle_anomaly(drone)
+    else:
+        anomaly = gen_random_anomaly()
+        if anomaly is not None:
+            send_anomaly(anomaly)
+            datastream = gen_Datastream(gen_abnormal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
+        else:
+            datastream = gen_Datastream(gen_normal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
 
     # Handle positions and battery change
     drone = handle_drone_battery(drone)
     drone = handle_drone_position(drone)
     drone = handle_drone_commands(drone)
 
-    anomaly = gen_random_anomaly()
-    if anomaly is not None:
-        send_anomaly(anomaly)
-        datastream = gen_Datastream(gen_abnormal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
-    else:
-        datastream = gen_Datastream(gen_normal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
-
     # update the drone both locally and on the controller
     update_drone(drone)
     update_drone_at_controller(drone, drone_identifier)
 
-    send_datastream(datastream)
-    update_datastream(datastream)
+    if datastream is not None:
+        send_datastream(datastream)
+        update_datastream(datastream)
 
     # call main() again in LOOP_TIME
     threading.Timer(LOOP_TIME, main).start()
