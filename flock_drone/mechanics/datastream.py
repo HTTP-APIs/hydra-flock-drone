@@ -45,6 +45,19 @@ def update_datastream(datastream):
         raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
 
 
+def add_datastream(datastream):
+    """Update the drone datastream on drone server."""
+    try:
+        update_datastream_ = RES_DRONE.find_suitable_operation(
+            operation_type=SCHEMA.AddAction, input_type=DRONE.Datastream)
+        resp, body = update_datastream_(datastream)
+        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+
+        return Resource.from_iri(resp['location'])
+    except ConnectionRefusedError:
+        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+
+
 def get_datastream():
     """Get the drone datastream from drone server."""
     try:

@@ -49,6 +49,11 @@ def doc_gen(API, BASE_URL):
                                         "vocab:Drone",
                                         None,
                                         [{"statusCode": 200, "description": "Drone updated"}]))
+    drone.add_supported_op(HydraClassOp("AddDrone",
+                                        "PUT",
+                                        "vocab:Drone",
+                                        None,
+                                        [{"statusCode": 200, "description": "Drone added"}]))
 
     # Command Class
     # NOTE: Commands are stored in a collection. You may GET a command or you may DELETE it, there is not UPDATE.
@@ -94,6 +99,11 @@ def doc_gen(API, BASE_URL):
                                              "vocab:Datastream",
                                              None,
                                              [{"statusCode": 200, "description": "Datastream updated"}]))
+    datastream.add_supported_op(HydraClassOp("AddDatastream",
+                                             "PUT",
+                                             "vocab:Datastream",
+                                             None,
+                                             [{"statusCode": 200, "description": "Datastream added"}]))
 
     anomaly = HydraClass("Anomaly", "Anomaly", "Class for Temperature anomalies that need to be confirmed", endpoint=True)
     anomaly.add_supported_prop(HydraClassProp("vocab:Location", "Location", False, False, True))

@@ -3,7 +3,8 @@ import json
 import re
 from hydra import Resource, SCHEMA
 
-from flock_drone.mechanics.main import DRONE_URL, DRONE, RES_DRONE
+from flock_drone.mechanics.main import DRONE, RES_DRONE
+from flock_drone.settings import DRONE_URL
 
 
 def gen_Command(drone_id, state):

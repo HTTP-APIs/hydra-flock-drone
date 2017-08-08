@@ -1,5 +1,6 @@
 """Script for setting up Hydrus with flock_drone API Doc."""
-from hydrus.app import app_factory, set_session, set_doc, set_hydrus_server_url
+from hydrus.app import app_factory
+from hydrus.utils import set_session, set_doc, set_hydrus_server_url
 from hydrus.data import doc_parse
 from hydrus.hydraspec import doc_maker
 from sqlalchemy import create_engine

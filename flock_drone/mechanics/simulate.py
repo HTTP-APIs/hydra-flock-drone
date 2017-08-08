@@ -18,7 +18,7 @@ from flock_drone.mechanics.commands import get_command_collection, get_command, 
 global LOOP_TIME, ITERATOR
 LOOP_TIME = 15
 
-CONTROLLER_LOC = tuple(float(x) for x in get_controller_location().split(","))
+CONTROLLER_LOC = tuple(float(x) for x in get_controller_location()["Location"].split(","))
 
 DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
 
@@ -28,7 +28,7 @@ ITERATOR = 0
 def handle_drone_commands(drone):
     """Handle the commands on the drone server and update drone accordingly."""
     # Using the latest command, not following previously stored ones, server will ensure order
-    commands = get_command_collection()["members"]
+    commands = get_command_collection()
     command_ids = [x["@id"] for x in commands]
     temp_list = list()
     for id_ in command_ids:
@@ -38,11 +38,12 @@ def handle_drone_commands(drone):
             temp_list.append(matchObj.group(2))
     temp_list.sort()
 
-    latest_command = get_command(temp_list[-1])
-    # Execute the latest command
-    drone = execute_command(latest_command, drone)
-    # Delete after execution
-    delete_commands(temp_list)
+    if len(temp_list) > 0:
+        latest_command = get_command(temp_list[-1])
+        # Execute the latest command
+        drone = execute_command(latest_command, drone)
+        # Delete after execution
+        delete_commands(temp_list)
 
     return drone
 
@@ -232,6 +233,7 @@ def read_random_data():
 
 def main():
     """15 second time loop for drone."""
+    print("simulating")
     drone = get_drone()
     drone_identifier = drone["DroneID"]
     datastream = None
@@ -242,7 +244,7 @@ def main():
             data = read_random_data()
             datastream = gen_Datastream(data, drone["DroneState"]["Position"], drone_identifier)
     else:
-        anomaly = gen_random_anomaly()
+        anomaly = gen_random_anomaly(drone)
         if anomaly is not None:
             send_anomaly(anomaly)
             datastream = gen_Datastream(gen_abnormal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)

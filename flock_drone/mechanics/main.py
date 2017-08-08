@@ -7,14 +7,13 @@ from flock_drone.settings import CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
 from flock_drone.settings import CENTRAL_SERVER_URL
 from flock_drone.settings import IRI_CS, IRI_DRONE, DRONE_DEFAULT
 
+
 from flock_drone.mechanics.logs import send_http_api_log, gen_HttpApiLog
 
-
-global CENTRAL_SERVER, DRONE
+global CENTRAL_SERVER, DRONE, RES_CS, RES_DRONE
 CENTRAL_SERVER = Namespace(CENTRAL_SERVER_NAMESPACE)
 DRONE = Namespace(DRONE_NAMESPACE)
 
-global RES_CS, RES_DRONE
 RES_CS = Resource.from_iri(IRI_CS)
 RES_DRONE = Resource.from_iri(IRI_DRONE)
 
@@ -45,7 +44,9 @@ def get_controller_location():
         resp, body = get_controller_location_()
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
         location_obj = json.loads(body.decode('utf-8'))
-        return location_obj["Location"]
+        location_obj.pop("@context")
+        location_obj.pop("@type")
+        return location_obj
     except ConnectionRefusedError as e:
         print(e)
         print("Failed to use controller location, returning default")
