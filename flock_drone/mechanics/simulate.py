@@ -208,7 +208,7 @@ def gen_random_anomaly(drone):
         ITERATOR = 0
         option = random.choice([False, True, False])
         if option:
-            anomaly = gen_Anomaly(drone["DroneState"]["Position"])
+            anomaly = gen_Anomaly(drone["DroneState"]["Position"], drone["DroneState"]["DroneID"])
             return anomaly
     return None
 

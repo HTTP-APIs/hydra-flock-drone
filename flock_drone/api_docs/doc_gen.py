@@ -97,7 +97,8 @@ def doc_gen(API, BASE_URL):
 
     anomaly = HydraClass("Anomaly", "Anomaly", "Class for Temperature anomalies that need to be confirmed", endpoint=True)
     anomaly.add_supported_prop(HydraClassProp("vocab:Location", "Location", False, False, True))
-    # anomaly.add_supported_prop(HydraClassProp("vocab:Location", "Location", False, False, True))
+    anomaly.add_supported_prop(HydraClassProp("http://schema.org/identifier", "DroneID", False, False, True))
+
     anomaly.add_supported_op(HydraClassOp("GetAnomaly",
                                           "GET",
                                           None,

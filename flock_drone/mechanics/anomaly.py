@@ -11,11 +11,12 @@ def get_new_state(anomaly, drone):
     pass
 
 
-def gen_Anomaly(location):
+def gen_Anomaly(location, id_):
     """Generate an anomaly object."""
     anomaly = {
         "@type": "Anomaly",
-        "Location": location
+        "Location": location,
+        "DroneID": id_
     }
 
     return anomaly
