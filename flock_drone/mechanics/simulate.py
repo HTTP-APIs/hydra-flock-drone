@@ -221,6 +221,15 @@ def handle_anomaly(drone):
     return drone
 
 
+def read_random_data():
+    """Read abnormal data [3/4] chance and normal data [1/4] chance."""
+    option = random.choice([True, False, True, True])
+    if option:
+        return gen_abnormal_sensor_data()
+    else:
+        return gen_normal_sensor_data()
+
+
 def main():
     """15 second time loop for drone."""
     drone = get_drone()
@@ -228,7 +237,10 @@ def main():
     datastream = None
 
     if is_confirming(drone):
-        drone = handle_anomaly(drone)
+        drone, action = handle_anomaly(drone)
+        if action is not None:
+            data = read_random_data()
+            datastream = gen_Datastream(data, drone["DroneState"]["Position"], drone_identifier)
     else:
         anomaly = gen_random_anomaly()
         if anomaly is not None:

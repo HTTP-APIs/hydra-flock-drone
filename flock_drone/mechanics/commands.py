@@ -1,5 +1,6 @@
 """Handle operations related to new commands for the drone."""
 import json
+import re
 from hydra import Resource, SCHEMA
 
 from flock_drone.mechanics.main import DRONE_URL, DRONE, RES_DRONE
@@ -22,7 +23,14 @@ def get_command_collection():
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
     body = json.loads(body.decode('utf-8'))
-    return body
+    command_list = list()
+    for command in body["members"]:
+        regex = r'/(.*)/(\d)'
+        matchObj = re.match(regex, command["@id"])
+        if matchObj:
+            command_list.append(get_command(matchObj.group(2)))
+
+    return command_list
 
 
 def add_command(command):
@@ -39,12 +47,14 @@ def add_command(command):
 def get_command(id_):
     """Get the command using @id."""
     try:
-        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
+        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + str(id_))
         # name = i.value(SCHEMA.name)
         resp, body = i.find_suitable_operation(operation_type=None, input_type=None,
                                                output_type=DRONE.Command)()
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
         body = json.loads(body.decode('utf-8'))
+        body.pop("@context")
+        body.pop("@type")
         return body
     except:
         return {404: "Resource with Id %s not found!" % (id_,)}

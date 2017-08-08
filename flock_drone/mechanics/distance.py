@@ -75,6 +75,22 @@ def get_distance_between_coordinates(a, b):
     return haversine(a, b)
 
 
+def get_direction(source, destination):
+    """Find the direction drone needs to move to get from src to dest."""
+    lat_diff = abs(source[0] - destination[0])
+    long_diff = abs(source[1] - destination[1])
+    if lat_diff > long_diff:
+        if source[0] > destination[0]:
+            return "S"
+        else:
+            return "N"
+    else:
+        if source[1] > destination[1]:
+            return "W"
+        else:
+            return "E"
+
+
 def deg2num(lat_deg, lon_deg, zoom):
     """Convert latitute and longitude to map tile index."""
     lat_rad = math.radians(lat_deg)
