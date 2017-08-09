@@ -1,10 +1,6 @@
 """Script for setting up Hydrus with flock_drone API Doc."""
-import os, sys
-curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-sys.path.insert(0, parentDir)
-
-from hydrus.app import app_factory, set_session, set_doc, set_hydrus_server_url
+from hydrus.app import app_factory
+from hydrus.utils import set_session, set_doc, set_hydrus_server_url
 from hydrus.data import doc_parse
 from hydrus.hydraspec import doc_maker
 from sqlalchemy import create_engine
@@ -14,54 +10,28 @@ from flock_drone.settings import DB_URL, PORT, HYDRUS_SERVER_URL, API_NAME
 from flock_drone.api_docs.doc import doc
 
 
-# The database connection URL
-# See http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#sqlalchemy.create_engine for more info
-# db_path = os.path.join(os.path.dirname(__file__), 'database.db')
-# DB_URL = 'sqlite:///{}'.format(db_path)
-
-# print(DB_URL)
-# Define the server URL, this is what will be displayed on the Doc
-# HYDRUS_SERVER_URL = "http://localhost:8080/"
-
-# The port on which Hydrus should run
-# PORT = 8080
-
-# The name of the API or the EntryPoint, the api will be at http://localhost/<API_NAME>
-# API_NAME = "serverapi"
-
-
 if __name__ == "__main__":
-    # Create a connection to the database you want to use
     engine = create_engine(DB_URL)
 
-    # Drop database if exists and create a new one.
     print("Droping database if exist")
-
     Base.metadata.drop_all(engine)
 
     print("Creating models....")
     Base.metadata.create_all(engine)
+
     print("Done")
 
-    # Define the Hydra API Documentation
-    # NOTE: You can use your own API Documentation and create a HydraDoc object using doc_maker
-    #       Or you may create your own HydraDoc Documentation using doc_writer [see hydrus/hydraspec/doc_writer_sample]
     apidoc = doc_maker.createDoc(doc, HYDRUS_SERVER_URL, API_NAME)
 
-    # Start a session with the DB and create all classes needed by the APIDoc
     session = sessionmaker(bind=engine)()
 
-    # Get all the classes from the doc
-    classes = doc_parse.get_classes(apidoc.generate())     # You can also pass a dictionary as defined in hydrus/hydraspec/doc_writer_sample_output.py
+    classes = doc_parse.get_classes(apidoc.generate())
 
-    # Get all the properties from the classes
     properties = doc_parse.get_all_properties(classes)
 
-    # Insert them into the database
     doc_parse.insert_classes(classes, session)
     doc_parse.insert_properties(properties, session)
 
-    # Create a Hydrus app with the API name you want, default will be "api"
     app = app_factory(API_NAME)
 
     # Set the API Documentation
