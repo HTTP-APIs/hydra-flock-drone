@@ -4,7 +4,6 @@ from hydra import SCHEMA, Resource
 from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_controller_location, update_drone_at_controller
 from flock_drone.mechanics.datastream import gen_Datastream, add_datastream
 from flock_drone.settings import CENTRAL_SERVER_URL
-import pdb
 
 
 def init_drone_locally():
