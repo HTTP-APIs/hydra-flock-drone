@@ -1,4 +1,10 @@
 """Initialize drone."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, superParentDir)
+
 from flock_drone.mechanics.main import CENTRAL_SERVER, RES_CS, RES_DRONE, DRONE
 from hydra import SCHEMA, Resource
 from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_controller_location, update_drone_at_controller

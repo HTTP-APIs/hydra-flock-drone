@@ -1,4 +1,10 @@
 """Handle main configuration for the drone."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, superParentDir)
+
 import json
 from hydra import Resource, SCHEMA
 from rdflib import Namespace

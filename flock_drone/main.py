@@ -1,6 +1,12 @@
 """Script for setting up Hydrus with flock_drone API Doc."""
+import os, sys
+curDir = os.path.dirname(__file__)
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+sys.path.insert(0, parentDir)
+
 from hydrus.app import app_factory
-from hydrus.utils import set_session, set_doc, set_hydrus_server_url
+# from hydrus.utils import set_session, set_doc, set_hydrus_server_url
+from hydrus.app import set_session, set_doc, set_hydrus_server_url
 from hydrus.data import doc_parse
 from hydrus.hydraspec import doc_maker
 from sqlalchemy import create_engine
