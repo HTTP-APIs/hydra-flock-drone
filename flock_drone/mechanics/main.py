@@ -6,7 +6,8 @@ from rdflib import Namespace
 from flock_drone.settings import CENTRAL_SERVER_NAMESPACE, DRONE_NAMESPACE
 from flock_drone.settings import CENTRAL_SERVER_URL
 from flock_drone.settings import IRI_CS, IRI_DRONE, DRONE_DEFAULT
-
+import pdb
+import time
 
 from flock_drone.mechanics.logs import send_http_api_log, gen_HttpApiLog
 
@@ -74,14 +75,12 @@ def update_drone_at_controller(drone, drone_identifier):
     """Update the drone object at central controller."""
     id_ = "/api/DroneCollection/" + str(drone_identifier)
     try:
-        i = Resource.from_iri(CENTRAL_SERVER_URL + id_)
-        # name = i.value(SCHEMA.name)
-        resp, _ = i.find_suitable_operation(operation_type=SCHEMA.UpdateAction,
-                                            input_type=CENTRAL_SERVER.Drone)(drone)
-        if resp.status // 100 != 2:
-            return "error updating <%s>" % i.identifier
-        else:
-            return "updated <%s>" % i.identifier
+        print("Updating drone")
+        RES = Resource.from_iri(CENTRAL_SERVER_URL + id_)
+        operation = RES.find_suitable_operation(operation_type=SCHEMA.AddAction, input_type=CENTRAL_SERVER.Drone)
+        assert operation is not None
+        resp, body = operation(drone)
+        assert resp.status in [200, 201]
     except:
         return {404: "Resource with Id %s not found!" % (id_,)}
 

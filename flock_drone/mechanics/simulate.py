@@ -2,9 +2,7 @@
 import threading
 import random
 import re
-from flock_drone.mechanics.main import (get_drone, update_drone,
-                                        get_controller_location,
-                                        update_drone_at_controller)
+from flock_drone.mechanics.main import get_drone, update_drone, get_controller_location, update_drone_at_controller
 
 from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
                                         gen_DroneLog, gen_HttpApiLog)
@@ -205,11 +203,11 @@ def gen_random_anomaly(drone):
     global ITERATOR
     ITERATOR += 1
     # 1/3 chance of anomaly every ten iterations
-    if ITERATOR % 10 == 0:
+    if ITERATOR % 2 == 0:
         ITERATOR = 0
         option = random.choice([False, True, False])
         if option:
-            anomaly = gen_Anomaly(drone["DroneState"]["Position"], drone["DroneState"]["DroneID"])
+            anomaly = gen_Anomaly(drone["DroneState"]["Position"], drone["DroneID"])
             return anomaly
     return None
 
@@ -233,12 +231,13 @@ def read_random_data():
 
 def main():
     """15 second time loop for drone."""
-    print("simulating")
+    print("Retrieving the drone details")
     drone = get_drone()
     drone_identifier = drone["DroneID"]
     datastream = None
 
     if is_confirming(drone):
+        print("Drone handling anomaly")
         drone, action = handle_anomaly(drone)
         if action is not None:
             data = read_random_data()
@@ -246,7 +245,8 @@ def main():
     else:
         anomaly = gen_random_anomaly(drone)
         if anomaly is not None:
-            send_anomaly(anomaly)
+            print("New anomaly created")
+            send_anomaly(anomaly, drone)
             datastream = gen_Datastream(gen_abnormal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
         else:
             datastream = gen_Datastream(gen_normal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
@@ -269,4 +269,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # anomaly = gen_Anomaly("0.956901647439813,14.08447265625", "22")
+    # send_anomaly(anomaly, "22")
     main()
