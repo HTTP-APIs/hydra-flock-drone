@@ -79,12 +79,13 @@ def init_drone():
         remove_drone(drone_id)
         print("Previous drone successfully deleted from the central server.")
         drone_id = int(add_drone(drone))
-
+    print(drone_id)
     # Update the drone on localhost
     drone["DroneID"] = drone_id
 
     update_drone(drone)
     update_drone_at_controller(drone, drone_id)
+
     print("Drone initialized successfully!")
 
 

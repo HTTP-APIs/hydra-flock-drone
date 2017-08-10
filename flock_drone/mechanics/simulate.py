@@ -2,9 +2,7 @@
 import threading
 import random
 import re
-from flock_drone.mechanics.main import (get_drone, update_drone,
-                                        get_controller_location,
-                                        update_drone_at_controller)
+from flock_drone.mechanics.main import get_drone, update_drone, get_controller_location, update_drone_at_controller
 
 from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
                                         gen_DroneLog, gen_HttpApiLog)
@@ -271,6 +269,6 @@ def main():
 
 
 if __name__ == "__main__":
-    anomaly = gen_Anomaly("0.956901647439813,14.08447265625", "22")
-    send_anomaly(anomaly, "22")
+    # anomaly = gen_Anomaly("0.956901647439813,14.08447265625", "22")
+    # send_anomaly(anomaly, "22")
     main()
