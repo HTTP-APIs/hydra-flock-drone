@@ -253,7 +253,7 @@ def main():
         anomaly = gen_random_anomaly(drone)
         if anomaly is not None:
             print("New anomaly created")
-            send_anomaly(anomaly, drone)
+            send_anomaly(anomaly, drone_identifier)
             datastream = gen_Datastream(gen_abnormal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
         else:
             datastream = gen_Datastream(gen_normal_sensor_data(), drone["DroneState"]["Position"], drone_identifier)
