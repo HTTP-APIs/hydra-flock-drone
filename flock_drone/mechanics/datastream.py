@@ -56,8 +56,6 @@ def add_datastream(datastream):
     try:
         update_datastream_ = RES_DRONE.find_suitable_operation(operation_type= SCHEMA.AddAction, input_type=DRONE.Datastream)
         resp, body = update_datastream_(datastream)
-        import pdb
-        pdb.set_trace()
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
         return Resource.from_iri(resp['location'])
