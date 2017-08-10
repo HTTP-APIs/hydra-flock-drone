@@ -83,11 +83,14 @@ def update_drone_at_controller(drone, drone_identifier):
     try:
         print("Updating drone")
         RES = Resource.from_iri(CENTRAL_SERVER_URL + id_)
-        operation = RES.find_suitable_operation(operation_type=SCHEMA.AddAction, input_type=CENTRAL_SERVER.Drone)
+        operation = RES.find_suitable_operation(input_type=CENTRAL_SERVER.Drone)
         assert operation is not None
         resp, body = operation(drone)
+        print(drone)
         assert resp.status in [200, 201]
-    except:
+    except Exception as e:
+        print(e)
+        # print("exception")
         return {404: "Resource with Id %s not found!" % (id_,)}
 
     http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "POST Drone", "Controller")
@@ -105,8 +108,13 @@ def ordered(obj):
 
 
 if __name__ == "__main__":
-    get_drone()
-    print(update_drone(get_drone_default()))
+
+    print(get_drone())
+    drone = get_drone()
+    drone_identifier = drone["DroneID"]
+    print(drone_identifier)
+    print(update_drone_at_controller(drone, drone_identifier))
+    # print(update_drone(get_drone_default()))
     # print(get_drone_id())
     # datastream = gen_datastream(100, "0,0", get_drone_id())
     # print(update_datastream(datastream))

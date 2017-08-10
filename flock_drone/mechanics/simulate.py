@@ -239,6 +239,7 @@ def main():
     """15 second time loop for drone."""
     print("Retrieving the drone details")
     drone = get_drone()
+    print(drone)
     drone_identifier = drone["DroneID"]
     datastream = None
 
@@ -264,7 +265,8 @@ def main():
 
     # update the drone both locally and on the controller
     update_drone(drone)
-    update_drone_at_controller(drone, drone_identifier)
+
+    print(update_drone_at_controller(drone, drone_identifier))
 
     if datastream is not None:
         send_datastream(datastream)
