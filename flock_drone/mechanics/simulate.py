@@ -28,7 +28,7 @@ DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
 
 ITERATOR = 0
 
-
+# Command related functions
 def handle_drone_commands(drone):
     """Handle the commands on the drone server and update drone accordingly."""
     # Using the latest command, not following previously stored ones, server will ensure order
@@ -192,6 +192,7 @@ def handle_drone_position(drone):
     return new_drone
 
 
+# Datastream related functions
 def gen_normal_sensor_data():
     """Generate normal sensor data for drone datastream."""
     normal_range = range(25, 40)
@@ -204,6 +205,16 @@ def gen_abnormal_sensor_data():
     return random.choice(abnormal_range)
 
 
+def read_random_data():
+    """Read abnormal data [3/4] chance and normal data [1/4] chance."""
+    option = random.choice([True, False, True, True])
+    if option:
+        return gen_abnormal_sensor_data()
+    else:
+        return gen_normal_sensor_data()
+
+
+# Anomaly related functions
 def gen_random_anomaly(drone):
     """Generate an anomaly at random."""
     global ITERATOR
@@ -226,15 +237,6 @@ def handle_anomaly(drone):
     return drone
 
 
-def read_random_data():
-    """Read abnormal data [3/4] chance and normal data [1/4] chance."""
-    option = random.choice([True, False, True, True])
-    if option:
-        return gen_abnormal_sensor_data()
-    else:
-        return gen_normal_sensor_data()
-
-
 def main():
     """15 second time loop for drone."""
     print("Retrieving the drone details")
@@ -245,10 +247,8 @@ def main():
 
     if is_confirming(drone):
         print("Drone handling anomaly")
-        drone, action = handle_anomaly(drone)
-        if action is not None:
-            data = read_random_data()
-            datastream = gen_Datastream(data, drone["DroneState"]["Position"], drone_identifier)
+        drone = handle_anomaly(drone)
+
     else:
         anomaly = gen_random_anomaly(drone)
         if anomaly is not None:
