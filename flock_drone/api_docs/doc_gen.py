@@ -123,6 +123,16 @@ def doc_gen(API, BASE_URL):
                                           "vocab:Anomaly",
                                           [{"statusCode": 404, "description": "Anomaly not found"},
                                            {"statusCode": 200, "description": "Anomaly returned"}]))
+    anomaly.add_supported_op(HydraClassOp("AddAnomaly",
+                                          "PUT",
+                                          "vocab:Anomaly",
+                                          None,
+                                           [{"statusCode": 201, "description": "Anomaly added successfully"}]))
+    anomaly.add_supported_op(HydraClassOp("UpdateAnomaly",
+                                          "POST",
+                                          "vocab:Anomaly",
+                                          None,
+                                           [{"statusCode": 201, "description": "Anomaly updated successfully"}]))
 
     api_doc.add_supported_class(state, collection=False)
     api_doc.add_supported_class(drone, collection=False)

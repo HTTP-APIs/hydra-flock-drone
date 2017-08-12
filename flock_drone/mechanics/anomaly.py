@@ -86,8 +86,6 @@ def update_anomaly_at_controller(anomaly, anomaly_id, drone_identifier):
         assert operation is not None
         print(anomaly)
         resp, body = operation(anomaly)
-        print(resp, body)
-        print(anomaly)
         assert resp.status in [200, 201]
     except Exception as e:
         print(e)

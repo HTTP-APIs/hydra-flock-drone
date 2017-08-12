@@ -36,7 +36,7 @@ def handle_drone_commands(drone):
     command_ids = [x["@id"] for x in commands]
     temp_list = list()
     for id_ in command_ids:
-        regex = r'/(.*)/(\d)'
+        regex = r'/(.*)/(\d*)'
         matchObj = re.match(regex, id_)
         if matchObj:
             temp_list.append(matchObj.group(2))
@@ -220,7 +220,7 @@ def gen_random_anomaly(drone):
     global ITERATOR
     ITERATOR += 1
     # 1/3 chance of anomaly every ten iterations
-    if ITERATOR % 2 == 0:
+    if ITERATOR % 10 == 0:
         ITERATOR = 0
         option = random.choice([False, True, False])
         if option:

@@ -230,53 +230,89 @@ doc = {
             "title": "Drone"
         },
         {
-            "@id": "vocab:State",
+            "@id": "vocab:Anomaly",
             "@type": "hydra:Class",
-            "description": "Class for drone state objects",
-            "supportedOperation": [],
+            "description": "Class for Temperature anomalies that need to be confirmed",
+            "supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "expects": "null",
+                    "method": "GET",
+                    "possibleStatus": [
+                        {
+                            "description": "Anomaly not found",
+                            "statusCode": 404
+                        },
+                        {
+                            "description": "Anomaly returned",
+                            "statusCode": 200
+                        }
+                    ],
+                    "returns": "vocab:Anomaly",
+                    "title": "GetAnomaly"
+                },
+                {
+                    "@type": "http://schema.org/AddAction",
+                    "expects": "vocab:Anomaly",
+                    "method": "PUT",
+                    "possibleStatus": [
+                        {
+                            "description": "Anomaly added successfully",
+                            "statusCode": 201
+                        }
+                    ],
+                    "returns": "null",
+                    "title": "AddAnomaly"
+                },
+                {
+                    "@type": "http://schema.org/UpdateAction",
+                    "expects": "vocab:Anomaly",
+                    "method": "POST",
+                    "possibleStatus": [
+                        {
+                            "description": "Anomaly updated successfully",
+                            "statusCode": 201
+                        }
+                    ],
+                    "returns": "null",
+                    "title": "UpdateAnomaly"
+                }
+            ],
             "supportedProperty": [
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://auto.schema.org/speed",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Speed",
+                    "property": "vocab:Location",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "Location",
                     "writeonly": "false"
                 },
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://schema.org/geo",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Position",
+                    "property": "http://schema.org/identifier",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "DroneID",
                     "writeonly": "false"
                 },
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://schema.org/Property",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Direction",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/fuelCapacity",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Battery",
-                    "writeonly": "true"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "https://schema.org/status",
-                    "readonly": "true",
-                    "required": "false",
+                    "property": "http://schema.org/eventStatus",
+                    "readonly": "false",
+                    "required": "true",
                     "title": "Status",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/identifier",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "AnomalyID",
                     "writeonly": "false"
                 }
             ],
-            "title": "State"
+            "title": "Anomaly"
         },
         {
             "@id": "vocab:Command",
@@ -348,63 +384,53 @@ doc = {
             "title": "Command"
         },
         {
-            "@id": "vocab:Anomaly",
+            "@id": "vocab:State",
             "@type": "hydra:Class",
-            "description": "Class for Temperature anomalies that need to be confirmed",
-            "supportedOperation": [
-                {
-                    "@type": "hydra:Operation",
-                    "expects": "null",
-                    "method": "GET",
-                    "possibleStatus": [
-                        {
-                            "description": "Anomaly not found",
-                            "statusCode": 404
-                        },
-                        {
-                            "description": "Anomaly returned",
-                            "statusCode": 200
-                        }
-                    ],
-                    "returns": "vocab:Anomaly",
-                    "title": "GetAnomaly"
-                }
-            ],
+            "description": "Class for drone state objects",
+            "supportedOperation": [],
             "supportedProperty": [
                 {
                     "@type": "SupportedProperty",
-                    "property": "vocab:Location",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "Location",
+                    "property": "http://auto.schema.org/speed",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Speed",
                     "writeonly": "false"
                 },
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://schema.org/identifier",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "DroneID",
+                    "property": "http://schema.org/geo",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Position",
                     "writeonly": "false"
                 },
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://schema.org/eventStatus",
-                    "readonly": "false",
-                    "required": "true",
+                    "property": "http://schema.org/Property",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Direction",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/fuelCapacity",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Battery",
+                    "writeonly": "true"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "https://schema.org/status",
+                    "readonly": "true",
+                    "required": "false",
                     "title": "Status",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/identifier",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "AnomalyID",
                     "writeonly": "false"
                 }
             ],
-            "title": "Anomaly"
+            "title": "State"
         },
         {
             "@id": "http://www.w3.org/ns/hydra/core#Collection",
@@ -649,6 +675,36 @@ doc = {
                                     {
                                         "description": "Anomaly returned",
                                         "statusCode": 200
+                                    }
+                                ]
+                            },
+                            {
+                                "@id": "_:addanomaly",
+                                "@type": "hydra:Operation",
+                                "description": "null",
+                                "expects": "vocab:Anomaly",
+                                "label": "AddAnomaly",
+                                "method": "PUT",
+                                "returns": "null",
+                                "statusCodes": [
+                                    {
+                                        "description": "Anomaly added successfully",
+                                        "statusCode": 201
+                                    }
+                                ]
+                            },
+                            {
+                                "@id": "_:updateanomaly",
+                                "@type": "hydra:Operation",
+                                "description": "null",
+                                "expects": "vocab:Anomaly",
+                                "label": "UpdateAnomaly",
+                                "method": "POST",
+                                "returns": "null",
+                                "statusCodes": [
+                                    {
+                                        "description": "Anomaly updated successfully",
+                                        "statusCode": 201
                                     }
                                 ]
                             }
