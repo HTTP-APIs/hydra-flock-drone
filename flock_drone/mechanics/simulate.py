@@ -15,7 +15,7 @@ from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
 
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream, send_datastream
 from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly, get_anomaly, update_anomaly_at_controller, update_anomaly_locally
-from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits, is_valid_location, drone_reached_destination
+from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_pos_limits_from_square_path, is_valid_location, drone_reached_destination
 from flock_drone.mechanics.commands import get_command_collection, get_command, delete_commands
 
 # Drone main Loop time settings
@@ -24,7 +24,7 @@ LOOP_TIME = 15
 
 CONTROLLER_LOC = tuple(float(x) for x in get_controller_location()["Location"].split(","))
 
-DRONE_BOUNDS = gen_drone_pos_limits(gen_square_path(CONTROLLER_LOC, 10))
+DRONE_BOUNDS = gen_pos_limits_from_square_path(gen_square_path(CONTROLLER_LOC, 10))
 
 ITERATOR = 0
 
