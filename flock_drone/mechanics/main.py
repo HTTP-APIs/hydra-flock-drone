@@ -83,7 +83,7 @@ def update_drone_at_controller(drone, drone_identifier):
     try:
         print("Updating drone")
         RES = Resource.from_iri(CENTRAL_SERVER_URL + id_)
-        operation = RES.find_suitable_operation(input_type=CENTRAL_SERVER.Drone)
+        operation = RES.find_suitable_operation(operation_type=SCHEMA.UpdateAction, input_type=CENTRAL_SERVER.Drone)
         assert operation is not None
         resp, body = operation(drone)
         print(drone)
