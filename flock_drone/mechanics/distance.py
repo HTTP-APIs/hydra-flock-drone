@@ -101,9 +101,9 @@ def get_direction(source, destination):
             return "N"
     else:
         if source[1] > destination[1]:
-            return "W"
-        else:
             return "E"
+        else:
+            return "W"
 
 def is_valid_location(location, bounds):
     """Check if location is in drone bounds."""

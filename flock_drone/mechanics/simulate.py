@@ -69,7 +69,8 @@ def discharge_drone_battery(drone):
         drone["DroneState"]["Battery"] = int(drone["DroneState"]["Battery"])-1
     else:
         # Battery level critical change drone status to OFF
-        drone["DroneState"]["Status"] = "Off"
+        # drone["DroneState"]["Status"] = "Off"
+        drone["DroneState"]["Battery"] = 100
 
     if int(battery_level) == 20:
 
@@ -249,7 +250,7 @@ def handle_anomaly(drone):
             if new_direction != drone["DroneState"]["Direction"]:
                 drone["DroneState"]["Direction"] = new_direction
 
-                dronelog = gen_DroneLog("Drone %s" % (str(drone_identifier),),
+                dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"]),),
                                 "changed direction to %s" % (str(new_direction)))
                 send_dronelog(dronelog)
 
@@ -260,7 +261,7 @@ def handle_anomaly(drone):
             print("Drone reached destination")
             anomaly["Status"] = "Confirmed"
             print("Updating anomaly locally")
-            # update_anomaly_locally(anomaly, drone["DroneID"])
+            update_anomaly_locally(anomaly, drone["DroneID"])
             print("Updating anomaly at controller")
             update_anomaly_at_controller(anomaly, anomaly["AnomalyID"], drone["DroneID"])
             print("Anomaly Confirmed")
@@ -311,7 +312,7 @@ def main():
         update_datastream(datastream)
 
     # call main() again in LOOP_TIME
-    threading.Timer(LOOP_TIME, main).start()
+    threading.Timer(1, main).start()
 
 
 if __name__ == "__main__":
