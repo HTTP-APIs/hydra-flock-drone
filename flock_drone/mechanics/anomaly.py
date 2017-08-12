@@ -7,7 +7,7 @@ sys.path.insert(0, superParentDir)
 
 import json
 from hydra import SCHEMA, Resource
-from flock_drone.settings import CENTRAL_SERVER_URL
+from flock_drone.settings import CENTRAL_SERVER_URL, DRONE_URL
 from flock_drone.mechanics.main import RES_CS, CENTRAL_SERVER, RES_DRONE, DRONE
 from flock_drone.mechanics.logs import (send_http_api_log, gen_HttpApiLog,
                                         send_dronelog, gen_DroneLog)

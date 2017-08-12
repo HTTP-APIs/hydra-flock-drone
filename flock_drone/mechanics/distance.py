@@ -116,7 +116,9 @@ def is_valid_location(location, bounds):
 
 def calculate_drone_range(speed, loop_time=15):
     """Calculate the range of drone for each iteration given speed in km/h and loop time in sec."""
-    return float(speed)*(3600/float(loop_time))*(1/2)
+    drone_range =  float(speed)*(float(loop_time)/3600)*(1/2)
+    return drone_range
+
 
 def drone_reached_destination(drone, destination):
     """Check if the drone has reached its destination."""

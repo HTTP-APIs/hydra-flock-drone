@@ -15,7 +15,7 @@ from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
 
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream, send_datastream
 from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly, get_anomaly, update_anomaly_at_controller, update_anomaly_locally
-from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_pos_limits_from_square_path, is_valid_location, drone_reached_destination
+from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_pos_limits_from_square_path, is_valid_location, drone_reached_destination, get_direction
 from flock_drone.mechanics.commands import get_command_collection, get_command, delete_commands
 
 # Drone main Loop time settings
@@ -226,10 +226,10 @@ def gen_random_anomaly(drone):
     """Generate an anomaly at random."""
     global ITERATOR
     ITERATOR += 1
-    # 1/4 chance of anomaly every ten iterations
+    # 1/3 chance of anomaly every ten iterations
     if ITERATOR % 10 == 0:
         ITERATOR = 0
-        option = random.choice([True, False, False, False])
+        option = random.choice([True, False, False])
         if option:
             anomaly = gen_Anomaly(drone["DroneState"]["Position"], drone["DroneID"])
             return anomaly
@@ -245,13 +245,22 @@ def handle_anomaly(drone):
             print("Drone moving toward anomaly")
             source = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
             new_direction = get_direction(source, destination)
-            drone["DroneState"]["Direction"] = new_direction
+            print(new_direction)
+            if new_direction != drone["DroneState"]["Direction"]:
+                drone["DroneState"]["Direction"] = new_direction
+
+                dronelog = gen_DroneLog("Drone %s" % (str(drone_identifier),),
+                                "changed direction to %s" % (str(new_direction)))
+                send_dronelog(dronelog)
+
+
+
         else:
             ## if reached destination
             print("Drone reached destination")
             anomaly["Status"] = "Confirmed"
             print("Updating anomaly locally")
-            update_anomaly_locally(anomaly, drone["DroneID"])
+            # update_anomaly_locally(anomaly, drone["DroneID"])
             print("Updating anomaly at controller")
             update_anomaly_at_controller(anomaly, anomaly["AnomalyID"], drone["DroneID"])
             print("Anomaly Confirmed")
