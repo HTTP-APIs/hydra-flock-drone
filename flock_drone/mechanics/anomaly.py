@@ -12,12 +12,6 @@ from flock_drone.mechanics.main import RES_CS, CENTRAL_SERVER, RES_DRONE, DRONE
 from flock_drone.mechanics.logs import (send_http_api_log, gen_HttpApiLog,
                                         send_dronelog, gen_DroneLog)
 
-
-def get_new_state(anomaly, drone):
-    """Get the new state of the drone to move towards the anomaly."""
-    pass
-
-
 def gen_Anomaly(location, id_):
     """Generate an anomaly object."""
     anomaly = {
@@ -44,8 +38,9 @@ def get_anomaly():
         anomaly.pop("@context", None)
         anomaly.pop("@id", None)
         return anomaly
-    except ConnectionRefusedError:
-        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+    except Exception as e:
+        print(e)
+        return None
 
 
 def send_anomaly(anomaly, drone_identifier):
@@ -94,6 +89,23 @@ def update_anomaly_at_controller(anomaly, anomaly_id, drone_identifier):
     http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "POST Anomaly", "Controller")
     send_http_api_log(http_api_log)
 
+def update_anomaly_locally(anomaly, drone_identifier):
+    """Update the anomaly object at local drone server."""
+    id_ = "/api/Anomaly"
+    try:
+        print("Updating anomaly")
+        RES = Resource.from_iri(DRONE_URL + id_)
+        operation = RES.find_suitable_operation(operation_type=SCHEMA.UpdateAction)
+        assert operation is not None
+        print(anomaly)
+        resp, body = operation(anomaly)
+        assert resp.status in [200, 201]
+    except Exception as e:
+        print(e)
+        return {404: "Resource with Id %s not found!" % (id_,)}
+
+    http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "POST Anomaly", "Localhost")
+    send_http_api_log(http_api_log)
 
 
 if __name__ == "__main__":

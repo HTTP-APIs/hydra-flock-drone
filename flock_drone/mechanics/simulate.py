@@ -14,8 +14,8 @@ from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
                                         gen_DroneLog, gen_HttpApiLog)
 
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream, send_datastream
-from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly, get_anomaly, get_new_state
-from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits
+from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly, get_anomaly, update_anomaly_at_controller, update_anomaly_locally
+from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_drone_pos_limits, is_valid_location, drone_reached_destination
 from flock_drone.mechanics.commands import get_command_collection, get_command, delete_commands
 
 # Drone main Loop time settings
@@ -122,20 +122,27 @@ def handle_drone_battery(drone):
     return drone
 
 
-# Distance related functions
-def is_valid_location(location, bounds):
-    """Check if location is in drone bounds."""
-    if min(bounds[0]) <= location[0] <= max(bounds[0]):
-        if min(bounds[1]) <= location[1] <= max(bounds[1]):
-            return True
-    return False
-
-
+## Drone state related functions
 def is_confirming(drone):
     """Check if the drone is in confirmation state."""
     return drone["DroneState"]["Status"] == "Confirming"
 
+def is_inactive(drone):
+    """Check if the drone is in inactive state."""
+    return drone["DroneState"]["Status"] == "Inactive"
 
+
+def is_active(drone):
+    """Check if the drone is in active state."""
+    return drone["DroneState"]["Status"] == "Active"
+
+
+def is_charging(drone):
+    """Check if the drone is in charging state."""
+    return drone["DroneState"]["Status"] == "Charging"
+
+
+# Distance related functions
 def get_random_direction_for_drone():
     """Return a random direction for drone."""
     return random.choice(["N", "S", "E", "W"])
@@ -232,8 +239,19 @@ def gen_random_anomaly(drone):
 def handle_anomaly(drone):
     """Handle the anomaly that the drone needs to check on."""
     anomaly = get_anomaly()
-    drone_state = get_new_state(anomaly, drone)
-    drone["DroneState"] = drone_state
+    if anomaly is not None:
+        destination = tuple(float(a) for a in anomaly["Location"].split(","))
+        if not drone_reached_destination(drone, destination):
+            source = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
+            new_direction = get_direction(source, destination)
+            drone["DroneState"]["Direction"] = new_direction
+        else:
+            ## if reached destination
+            anomaly["Status"] = "Confirmed"
+            update_anomaly_locally(anomaly, drone["DroneID"])
+            update_anomaly_at_controller(anomaly, anomaly["AnomalyID"], drone["DroneID"])
+            print("Anomaly Confirmed")
+            drone["DroneState"]["Status"] = "Active"
     return drone
 
 
@@ -245,11 +263,17 @@ def main():
     drone_identifier = drone["DroneID"]
     datastream = None
 
+    anomaly = get_anomaly()
+    if anomaly["Status"] == "Confirming":
+        drone["DroneState"]["Status"] = "Confirming"
+
     if is_confirming(drone):
         print("Drone handling anomaly")
         drone = handle_anomaly(drone)
+    elif is_inactive(drone):
+        pass
 
-    else:
+    elif is_active(drone):
         anomaly = gen_random_anomaly(drone)
         if anomaly is not None:
             print("New anomaly created")

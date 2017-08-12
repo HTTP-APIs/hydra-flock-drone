@@ -60,18 +60,18 @@ def get_new_coordinates(old_coordinates, distance_moved, direction):
     return gen_new_coordinates_from_change_in_coordinates(old_coordinates, change_in_coordinates)
 
 
-def gen_square_path(controller_coordinates, area_of_interest_square_dim):
+def gen_square_path(coordinates, square_dimension):
     """Generate square path for area of interest."""
     path = list()
-    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "W"), area_of_interest_square_dim, "S"))
-    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "W"), area_of_interest_square_dim, "N"))
-    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "E"), area_of_interest_square_dim, "N"))
-    path.append(get_new_coordinates(get_new_coordinates(controller_coordinates, area_of_interest_square_dim, "E"), area_of_interest_square_dim, "S"))
+    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "W"), square_dimension, "S"))
+    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "W"), square_dimension, "N"))
+    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "E"), square_dimension, "N"))
+    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "E"), square_dimension, "S"))
 
     return path
 
 
-def gen_drone_pos_limits(square_path):
+def gen_pos_limits_from_square_path(square_path):
     """Generate position bounds for drones."""
     return ([square_path[0][0], square_path[1][0]], [square_path[1][1], square_path[2][1]])
 
@@ -105,6 +105,33 @@ def get_direction(source, destination):
         else:
             return "E"
 
+def is_valid_location(location, bounds):
+    """Check if location is in drone bounds."""
+    if min(bounds[0]) <= location[0] <= max(bounds[0]):
+        if min(bounds[1]) <= location[1] <= max(bounds[1]):
+            return True
+    return False
+
+
+
+def calculate_drone_range(speed, loop_time=15):
+    """Calculate the range of drone for each iteration given speed in km/h and loop time in sec."""
+    return float(speed)*(3600/float(loop_time))*(1/2)
+
+def drone_reached_destination(drone, destination):
+    """Check if the drone has reached its destination."""
+    drone_position  = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
+    drone_range = calculate_drone_range(drone["DroneState"]["Speed"])
+
+    ## Generate a square bound for destination location
+    bounds_square_path = gen_square_path(destination, drone_range)
+    ## Generate bounds for location
+    destination_bounds = gen_pos_limits_from_square_path(bounds_square_path)
+
+    if is_valid_location(drone_position, destination_bounds):
+        return True
+    return False
+
 
 
 if __name__ == "__main__":
@@ -117,4 +144,4 @@ if __name__ == "__main__":
     print("\n\n")
     print(deg2num(-10.040397656836609, -55.03373871559225, 13))
 
-    print(gen_drone_pos_limits(gen_square_path(a, 10)))
+    print(gen_pos_limits_from_square_path(gen_square_path(a, 10)))
