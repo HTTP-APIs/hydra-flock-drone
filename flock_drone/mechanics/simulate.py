@@ -242,13 +242,17 @@ def handle_anomaly(drone):
     if anomaly is not None:
         destination = tuple(float(a) for a in anomaly["Location"].split(","))
         if not drone_reached_destination(drone, destination):
+            print("Drone moving toward anomaly")
             source = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
             new_direction = get_direction(source, destination)
             drone["DroneState"]["Direction"] = new_direction
         else:
             ## if reached destination
+            print("Drone reached destination")
             anomaly["Status"] = "Confirmed"
+            print("Updating anomaly locally")
             update_anomaly_locally(anomaly, drone["DroneID"])
+            print("Updating anomaly at controller")
             update_anomaly_at_controller(anomaly, anomaly["AnomalyID"], drone["DroneID"])
             print("Anomaly Confirmed")
             drone["DroneState"]["Status"] = "Active"
@@ -264,8 +268,9 @@ def main():
     datastream = None
 
     anomaly = get_anomaly()
-    if anomaly["Status"] == "Confirming":
-        drone["DroneState"]["Status"] = "Confirming"
+    if anomaly is not None:
+        if anomaly["Status"] == "Confirming" :
+            drone["DroneState"]["Status"] = "Confirming"
 
     if is_confirming(drone):
         print("Drone handling anomaly")

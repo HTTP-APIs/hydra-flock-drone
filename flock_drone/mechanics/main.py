@@ -90,6 +90,7 @@ def update_drone_at_controller(drone, drone_identifier):
         assert resp.status in [200, 201]
     except Exception as e:
         print(e)
+        print(drone, drone_identifier)
         # print("exception")
         return {404: "Resource with Id %s not found!" % (id_,)}
 
