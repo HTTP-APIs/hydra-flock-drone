@@ -219,10 +219,10 @@ def gen_random_anomaly(drone):
     """Generate an anomaly at random."""
     global ITERATOR
     ITERATOR += 1
-    # 1/5 chance of anomaly every ten iterations
+    # 1/4 chance of anomaly every ten iterations
     if ITERATOR % 10 == 0:
         ITERATOR = 0
-        option = random.choice([False, True, False, False, False])
+        option = random.choice([True, False, False, False])
         if option:
             anomaly = gen_Anomaly(drone["DroneState"]["Position"], drone["DroneID"])
             return anomaly
