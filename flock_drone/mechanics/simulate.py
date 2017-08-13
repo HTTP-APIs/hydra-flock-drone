@@ -401,8 +401,8 @@ def main():
             update_datastream(datastream)
 
     # call main() again in LOOP_TIME
-    # threading.Timer(LOOP_TIME, main).start()
-    threading.Timer(3, main).start()
+    threading.Timer(LOOP_TIME, main).start()
+    # threading.Timer(3, main).start()
 
 
 if __name__ == "__main__":
