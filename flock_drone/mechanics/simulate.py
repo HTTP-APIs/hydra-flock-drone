@@ -99,15 +99,17 @@ def discharge_drone_battery(drone):
     """Handle drone battery discharging."""
     battery_level = drone["DroneState"]["Battery"]
     drone_identifier = drone["DroneID"]
-    if(int(battery_level) > 3):
+    if float(battery_level) > 20:
         drone["DroneState"]["Battery"] = int(
             drone["DroneState"]["Battery"]) - 1
-    else:
-        # Battery level critical change drone status to OFF
-        drone["DroneState"]["Status"] = "Off"
+    elif float(battery_level) <= 20 and float(battery_level) >3:
+        ## Drone in inactive state will take less battery per iteration (1/4 of normal battery usage).
+        drone["DroneState"]["Battery"] = float(drone["DroneState"]["Battery"]) - 0.25
 
-    if int(battery_level) == 20:
+    if float(battery_level) == 20.0:
         drone["DroneState"]["Status"] = "Inactive"
+        drone["DroneState"]["Battery"] = int(
+            drone["DroneState"]["Battery"]) -1
 
         dronelog = gen_DroneLog("Drone %s" % (str(
             drone_identifier),), "battery Low %s, changing to Inactive state" % (str(drone["DroneState"]["Battery"])))
@@ -117,7 +119,8 @@ def discharge_drone_battery(drone):
             str(drone_identifier)), "PUT DroneLog", "Controller")
         send_http_api_log(http_api_log)
 
-    elif int(battery_level) == 4:
+    elif float(battery_level) == 4.0:
+        # Battery level critical change drone status to OFF
         drone["DroneState"]["Status"] = "Off"
 
         dronelog = gen_DroneLog("Drone %s" % (
@@ -134,19 +137,21 @@ def discharge_drone_battery(drone):
 def charge_drone_battery(drone):
     """Handle the drone battery charging operation."""
     battery_level = drone["DroneState"]["Battery"]
-    if int(battery_level) < 95:
+    if float(battery_level) < 95:
         # Increase battery level
-        drone["DroneState"]["Battery"] = int(battery_level) + 5
+        drone["DroneState"]["Battery"] = float(battery_level) + 5
     else:
         # If battery >= 95 set battery level to 100%
         drone["DroneState"]["Battery"] = 100
 
         dronelog = gen_DroneLog("Drone %s" % (
-            str(drone_identifier)), "charging complete, returning to Active state")
+            str(drone["DroneID"])), "charging complete, returning to Active state")
         send_dronelog(dronelog)
 
+        drone["DroneState"]["Status"] = "Active"
+
         http_api_log = gen_HttpApiLog("Drone %s" % (
-            str(drone_identifier)), "PUT DroneLog", "Controller")
+            str(drone["DroneID"])), "PUT DroneLog", "Controller")
         send_http_api_log(http_api_log)
 
     return drone
@@ -154,19 +159,20 @@ def charge_drone_battery(drone):
 
 def handle_drone_battery(drone):
     """Handle the drone battery status."""
-    if is_not_off(drone):
-        if is_charging(drone):
-            drone = charge_drone_battery(drone)
-        else:
-            drone = discharge_drone_battery(drone)
+    if is_charging(drone):
+        drone = charge_drone_battery(drone)
+    else:
+        drone = discharge_drone_battery(drone)
     return drone
 
 
 # Distance related functions
-def get_random_direction_for_drone():
-    """Return a random direction for drone."""
-    return random.choice(["N", "S", "E", "W"])
+def get_new_direction_for_drone(current_direction):
+    """Return a new direction for drone."""
+    directions = ["N","E", "S", "W"]
+    new_index = (directions.index(current_direction)+ 1) % len(directions)
 
+    return directions[new_index]
 
 def calculate_dis_travelled(speed, time):
     """Calculate the distance travelled(in Km) in a give amount of time(s)."""
@@ -175,7 +181,9 @@ def calculate_dis_travelled(speed, time):
 
 def handle_invalid_pos(drone, distance_travelled):
     """Handle invalid position update for drone."""
-    direction = get_random_direction_for_drone()
+    current_direction = drone["DroneState"]["Direction"]
+
+    direction = get_new_direction_for_drone(current_direction)
     drone["DroneState"]["Direction"] = direction
 
     drone_position = tuple(float(a)
@@ -206,21 +214,22 @@ def update_drone_position(drone, distance_travelled, direction):
 
 def handle_drone_position(drone):
     """Handle the drone position changes."""
-    drone_speed = float(drone["DroneState"]["Speed"])
-    distance_travelled = calculate_dis_travelled(drone_speed, LOOP_TIME)
-    drone_direction = str(drone["DroneState"]["Direction"])
-    drone_identifier = drone["DroneID"]
-    drone = update_drone_position(drone, distance_travelled, drone_direction)
+    if not is_charging(drone):
+        drone_speed = float(drone["DroneState"]["Speed"])
+        distance_travelled = calculate_dis_travelled(drone_speed, LOOP_TIME)
+        drone_direction = str(drone["DroneState"]["Direction"])
+        drone_identifier = drone["DroneID"]
+        drone = update_drone_position(drone, distance_travelled, drone_direction)
 
-    if(drone["DroneState"]["Direction"] != drone_direction):
+        if(drone["DroneState"]["Direction"] != drone_direction):
 
-        dronelog = gen_DroneLog("Drone %s" % (str(drone_identifier),),
-                                "changed direction to %s" % (str(new_drone["DroneState"]["Direction"])))
-        send_dronelog(dronelog)
+            dronelog = gen_DroneLog("Drone %s" % (str(drone_identifier),),
+                                    "changed direction to %s" % (str(drone["DroneState"]["Direction"])))
+            send_dronelog(dronelog)
 
-        http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)),
+            http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)),
                                       "PUT DroneLog", "Controller")
-        send_http_api_log(http_api_log)
+            send_http_api_log(http_api_log)
 
     return drone
 
@@ -272,20 +281,12 @@ def handle_anomaly(drone):
                                         "changed direction to %s" % (str(new_direction)))
                 send_dronelog(dronelog)
 
-                http_api_log = gen_HttpApiLog("Drone %s" % (str(drone["DroneID"])),
-                                              "PUT DroneLog", "Controller")
-                send_http_api_log(http_api_log)
-
         else:
             # if reached destination
             print("Drone reached destination")
-            dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"]),),
-                                    "reached anomaly location"))
+            dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"])),
+                                    "reached anomaly location")
             send_dronelog(dronelog)
-
-            http_api_log = gen_HttpApiLog("Drone %s" % (str(drone["DroneID"])),
-                                          "PUT DroneLog", "Controller")
-            send_http_api_log(http_api_log)
 
             anomaly["Status"] = "Confirmed"
             print("Updating anomaly locally")
@@ -294,15 +295,16 @@ def handle_anomaly(drone):
             update_anomaly_at_controller(
                 anomaly, anomaly["AnomalyID"], drone["DroneID"])
             print("Anomaly Confirmed")
-            drone["DroneState"]["Status"] = "Active"
 
-            dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"]),),
-                                    "Task completed! Returning to active state."))
+            dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"])),
+                                    "Task completed! Returning to active state.")
             send_dronelog(dronelog)
 
-            http_api_log = gen_HttpApiLog("Drone %s" % (str(drone["DroneID"])),
-                                          "PUT DroneLog", "Controller")
-            send_http_api_log(http_api_log)
+            drone["DroneState"]["Status"] = "Active"
+
+        http_api_log = gen_HttpApiLog("Drone %s" % (str(drone["DroneID"])),
+                                      "PUT DroneLog", "Controller")
+        send_http_api_log(http_api_log)
 
     return drone
 
@@ -326,7 +328,7 @@ def handle_drone_low_battery(drone):
     else:
         # if reached destination
         dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"]),),
-                                "changed direction to %s" % (str(new_direction)))
+                                "reached central controller, charging.")
         send_dronelog(dronelog)
 
         print("Drone reached destination")
@@ -339,51 +341,53 @@ def main():
     print("Retrieving the drone details")
     drone = get_drone()
     print(drone)
-    drone_identifier = drone["DroneID"]
-    datastream = None
 
-    anomaly = get_anomaly()
-    if anomaly is not None:
-        if anomaly["Status"] == "Confirming" and drone["DroneState"]["Status"] = "Active":
-            drone["DroneState"]["Status"] = "Confirming"
+    if is_not_off(drone):
 
-    if is_confirming(drone):
-        print("Drone handling anomaly")
-        drone = handle_anomaly(drone)
-
-    elif is_inactive(drone):
-        print("Drone battery low, needs to charge")
-        drone = handle_drone_low_battery(drone)
-
-    elif is_active(drone):
-        anomaly = gen_random_anomaly(drone)
+        drone_identifier = drone["DroneID"]
+        datastream = None
+        anomaly = get_anomaly()
         if anomaly is not None:
-            print("New anomaly created")
-            send_anomaly(anomaly, drone_identifier)
-            datastream = gen_Datastream(gen_abnormal_sensor_data(
-            ), drone["DroneState"]["Position"], drone_identifier)
-        else:
-            datastream = gen_Datastream(gen_normal_sensor_data(
-            ), drone["DroneState"]["Position"], drone_identifier)
+            if anomaly["Status"] == "Confirming" and drone["DroneState"]["Status"] == "Active":
+                drone["DroneState"]["Status"] = "Confirming"
 
-    # Handle positions and battery change
-    drone = handle_drone_battery(drone)
-    drone = handle_drone_position(drone)
-    drone = handle_drone_commands(drone)
+        if is_confirming(drone):
+            print("Drone handling anomaly")
+            drone = handle_anomaly(drone)
 
-    # update the drone both locally and on the controller
-    update_drone(drone)
+        elif is_inactive(drone):
+            print("Drone battery low, needs to charge")
+            drone = handle_drone_low_battery(drone)
 
-    print(update_drone_at_controller(drone, drone_identifier))
+        elif is_active(drone):
+            anomaly = gen_random_anomaly(drone)
+            if anomaly is not None:
+                print("New anomaly created")
+                send_anomaly(anomaly, drone_identifier)
+                datastream = gen_Datastream(gen_abnormal_sensor_data(
+                ), drone["DroneState"]["Position"], drone_identifier)
+            else:
+                datastream = gen_Datastream(gen_normal_sensor_data(
+                ), drone["DroneState"]["Position"], drone_identifier)
 
-    if datastream is not None:
-        ## Send datastream to central controller
-        send_datastream(datastream)
-        ## Update datastream locally
-        update_datastream(datastream)
+        # Handle positions and battery change
+        drone = handle_drone_battery(drone)
+        drone = handle_drone_position(drone)
+        drone = handle_drone_commands(drone)
+
+        # update the drone both locally and on the controller
+        update_drone(drone)
+
+        print(update_drone_at_controller(drone, drone_identifier))
+
+        if datastream is not None:
+            # Send datastream to central controller
+            send_datastream(datastream)
+            # Update datastream locally
+            update_datastream(datastream)
 
     # call main() again in LOOP_TIME
-    threading.Timer(15, main).start()
+    threading.Timer(1, main).start()
 
 
 if __name__ == "__main__":
