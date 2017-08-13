@@ -1,8 +1,11 @@
 """Operation related to datastream post operations."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
 sys.path.insert(0, superParentDir)
 
 import json
@@ -28,13 +31,15 @@ def gen_Datastream(temperature, position, drone_id):
 def send_datastream(datastream):
     """Post the drone current datastream to the central server."""
     drone_identifier = datastream["DroneID"]
-    post_datastream = RES_CS.find_suitable_operation(SCHEMA.AddAction, CENTRAL_SERVER.Datastream)
+    post_datastream = RES_CS.find_suitable_operation(
+        SCHEMA.AddAction, CENTRAL_SERVER.Datastream)
     resp, body = post_datastream(datastream)
 
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
     print("Datastream posted successfully.")
 
-    http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "PUT Datastream", "Controller")
+    http_api_log = gen_HttpApiLog("Drone %s" % (
+        str(drone_identifier)), "PUT Datastream", "Controller")
     send_http_api_log(http_api_log)
 
 
@@ -48,19 +53,22 @@ def update_datastream(datastream):
 
         return Resource.from_iri(resp['location'])
     except ConnectionRefusedError:
-        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+        raise ConnectionRefusedError(
+            "Connection Refused! Please check the drone server.")
 
 
 def add_datastream(datastream):
     """Update the drone datastream on drone server."""
     try:
-        update_datastream_ = RES_DRONE.find_suitable_operation(operation_type= SCHEMA.AddAction, input_type=DRONE.Datastream)
+        update_datastream_ = RES_DRONE.find_suitable_operation(
+            operation_type=SCHEMA.AddAction, input_type=DRONE.Datastream)
         resp, body = update_datastream_(datastream)
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
         return Resource.from_iri(resp['location'])
     except ConnectionRefusedError:
-        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+        raise ConnectionRefusedError(
+            "Connection Refused! Please check the drone server.")
 
 
 def get_datastream():
@@ -77,7 +85,8 @@ def get_datastream():
         datastream.pop("@id", None)
         return datastream
     except ConnectionRefusedError:
-        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+        raise ConnectionRefusedError(
+            "Connection Refused! Please check the drone server.")
 
 
 if __name__ == "__main__":

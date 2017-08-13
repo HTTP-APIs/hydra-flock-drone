@@ -1,8 +1,11 @@
 """Distance related functions."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
 sys.path.insert(0, superParentDir)
 
 from haversine import haversine
@@ -13,14 +16,14 @@ earth_radius = 6371.0   # For Kilometers
 
 def change_in_latitude(distance):
     """Given a distance north, return the change in latitude."""
-    return math.degrees((distance/earth_radius))
+    return math.degrees((distance / earth_radius))
 
 
 def change_in_longitude(latitude, distance):
     """Given a latitude and a distance west, return the change in longitude."""
     # Find the radius of a circle around the earth at given latitude.
-    r = earth_radius*math.cos(math.radians(latitude))
-    return math.degrees((distance/r))
+    r = earth_radius * math.cos(math.radians(latitude))
+    return math.degrees((distance / r))
 
 
 def convert_direction_to_north_or_west(distance_moved, direction):
@@ -44,7 +47,8 @@ def gen_new_coordinates_from_change_in_coordinates(old_coordinates, change_in_co
 def get_new_coordinates(old_coordinates, distance_moved, direction):
     """Get new coordinates given old coordinates (lat,lon), distance moved, direction of movement."""
     # Convert directions if needed
-    distance_moved, direction = convert_direction_to_north_or_west(distance_moved, direction)
+    distance_moved, direction = convert_direction_to_north_or_west(
+        distance_moved, direction)
 
     if direction == "N":
         latitude_change = change_in_latitude(distance_moved)
@@ -55,7 +59,8 @@ def get_new_coordinates(old_coordinates, distance_moved, direction):
         longitude_change = change_in_longitude(latitude, distance_moved)
         change_in_coordinates = (0, longitude_change)
     else:
-        raise TypeError("Not a valid direction of movement! Please use one of  ['N', 'S', 'E', 'W']")
+        raise TypeError(
+            "Not a valid direction of movement! Please use one of  ['N', 'S', 'E', 'W']")
 
     return gen_new_coordinates_from_change_in_coordinates(old_coordinates, change_in_coordinates)
 
@@ -63,10 +68,14 @@ def get_new_coordinates(old_coordinates, distance_moved, direction):
 def gen_square_path(coordinates, square_dimension):
     """Generate square path for area of interest."""
     path = list()
-    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "W"), square_dimension, "S"))
-    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "W"), square_dimension, "N"))
-    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "E"), square_dimension, "N"))
-    path.append(get_new_coordinates(get_new_coordinates(coordinates, square_dimension, "E"), square_dimension, "S"))
+    path.append(get_new_coordinates(get_new_coordinates(
+        coordinates, square_dimension, "W"), square_dimension, "S"))
+    path.append(get_new_coordinates(get_new_coordinates(
+        coordinates, square_dimension, "W"), square_dimension, "N"))
+    path.append(get_new_coordinates(get_new_coordinates(
+        coordinates, square_dimension, "E"), square_dimension, "N"))
+    path.append(get_new_coordinates(get_new_coordinates(
+        coordinates, square_dimension, "E"), square_dimension, "S"))
 
     return path
 
@@ -86,7 +95,8 @@ def deg2num(lat_deg, lon_deg, zoom):
     lat_rad = math.radians(lat_deg)
     n = 2.0 ** zoom
     xtile = int((lon_deg + 180.0) / 360.0 * n)
-    ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
+    ytile = int((1.0 - math.log(math.tan(lat_rad) +
+                                (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
     return (xtile, ytile)
 
 
@@ -105,6 +115,7 @@ def get_direction(source, destination):
         else:
             return "W"
 
+
 def is_valid_location(location, bounds):
     """Check if location is in drone bounds."""
     if min(bounds[0]) <= location[0] <= max(bounds[0]):
@@ -113,27 +124,26 @@ def is_valid_location(location, bounds):
     return False
 
 
-
 def calculate_drone_range(speed, loop_time=15):
     """Calculate the range of drone for each iteration given speed in km/h and loop time in sec."""
-    drone_range =  float(speed)*(float(loop_time)/3600)*(1/2)
+    drone_range = float(speed) * (float(loop_time) / 3600) * (1 / 2)
     return drone_range
 
 
 def drone_reached_destination(drone, destination):
     """Check if the drone has reached its destination."""
-    drone_position  = tuple(float(a) for a in drone["DroneState"]["Position"].split(","))
+    drone_position = tuple(float(a)
+                           for a in drone["DroneState"]["Position"].split(","))
     drone_range = calculate_drone_range(drone["DroneState"]["Speed"])
 
-    ## Generate a square bound for destination location
+    # Generate a square bound for destination location
     bounds_square_path = gen_square_path(destination, drone_range)
-    ## Generate bounds for location
+    # Generate bounds for location
     destination_bounds = gen_pos_limits_from_square_path(bounds_square_path)
 
     if is_valid_location(drone_position, destination_bounds):
         return True
     return False
-
 
 
 if __name__ == "__main__":

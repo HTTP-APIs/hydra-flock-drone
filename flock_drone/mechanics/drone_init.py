@@ -1,8 +1,11 @@
 """Initialize drone."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
 sys.path.insert(0, superParentDir)
 
 from flock_drone.mechanics.main import CENTRAL_SERVER, RES_CS, RES_DRONE, DRONE
@@ -59,7 +62,8 @@ def add_drone(drone):
 def remove_drone(drone_id):
     """Remove previous drone object from the central server."""
     try:
-        i = Resource.from_iri(CENTRAL_SERVER_URL + "/api/DroneCollection" + drone_id)
+        i = Resource.from_iri(CENTRAL_SERVER_URL +
+                              "/api/DroneCollection" + drone_id)
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction, None)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier

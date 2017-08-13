@@ -1,7 +1,9 @@
 """Script for setting up Hydrus with flock_drone API Doc."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
 sys.path.insert(0, parentDir)
 
 from hydrus.app import app_factory

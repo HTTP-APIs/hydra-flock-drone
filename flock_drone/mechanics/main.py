@@ -1,8 +1,11 @@
 """Handle main configuration for the drone."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
 sys.path.insert(0, superParentDir)
 
 import json
@@ -71,9 +74,11 @@ def update_drone(drone):
 
         return Resource.from_iri(resp['location'])
     except ConnectionRefusedError:
-        raise ConnectionRefusedError("Connection Refused! Please check the drone server.")
+        raise ConnectionRefusedError(
+            "Connection Refused! Please check the drone server.")
 
-    http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "POST DroneState", "Localhost")
+    http_api_log = gen_HttpApiLog("Drone %s" % (
+        str(drone_identifier)), "POST DroneState", "Localhost")
     send_http_api_log(http_api_log)
 
 
@@ -83,7 +88,8 @@ def update_drone_at_controller(drone, drone_identifier):
     try:
         print("Updating drone")
         RES = Resource.from_iri(CENTRAL_SERVER_URL + id_)
-        operation = RES.find_suitable_operation(operation_type=SCHEMA.UpdateAction, input_type=CENTRAL_SERVER.Drone)
+        operation = RES.find_suitable_operation(
+            operation_type=SCHEMA.UpdateAction, input_type=CENTRAL_SERVER.Drone)
         assert operation is not None
         resp, body = operation(drone)
         print(drone)
@@ -94,7 +100,8 @@ def update_drone_at_controller(drone, drone_identifier):
         # print("exception")
         return {404: "Resource with Id %s not found!" % (id_,)}
 
-    http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)), "POST Drone", "Controller")
+    http_api_log = gen_HttpApiLog("Drone %s" % (
+        str(drone_identifier)), "POST Drone", "Controller")
     send_http_api_log(http_api_log)
 
 

@@ -1,8 +1,11 @@
 """Handle operations related to new commands for the drone."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
-superParentDir = os.path.abspath(os.path.join(parentDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
 sys.path.insert(0, superParentDir)
 
 import json
@@ -25,7 +28,8 @@ def gen_Command(drone_id, state):
 
 def get_command_collection():
     """Get command collection from the drone server."""
-    get_command_collection_ = RES_DRONE.find_suitable_operation(None, None, DRONE.CommandCollection)
+    get_command_collection_ = RES_DRONE.find_suitable_operation(
+        None, None, DRONE.CommandCollection)
     resp, body = get_command_collection_()
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
@@ -42,7 +46,8 @@ def get_command_collection():
 
 def add_command(command):
     """Add command to drone server."""
-    add_command_ = RES_DRONE.find_suitable_operation(SCHEMA.AddAction, DRONE.Command)
+    add_command_ = RES_DRONE.find_suitable_operation(
+        SCHEMA.AddAction, DRONE.Command)
     resp, body = add_command_(command)
 
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)

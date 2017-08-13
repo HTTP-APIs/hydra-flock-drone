@@ -1,7 +1,9 @@
 """Settings for the drone."""
-import os, sys
+import os
+import sys
 curDir = os.path.dirname(__file__)
-parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) # this will return parent directory.
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
 sys.path.insert(0, parentDir)
 # Database connector
 global DB_URL

@@ -102,14 +102,15 @@ def discharge_drone_battery(drone):
     if float(battery_level) > 20:
         drone["DroneState"]["Battery"] = int(
             drone["DroneState"]["Battery"]) - 1
-    elif float(battery_level) <= 20 and float(battery_level) >3:
-        ## Drone in inactive state will take less battery per iteration (1/4 of normal battery usage).
-        drone["DroneState"]["Battery"] = float(drone["DroneState"]["Battery"]) - 0.25
+    elif float(battery_level) <= 20 and float(battery_level) > 3:
+        # Drone in inactive state will take less battery per iteration (1/4 of normal battery usage).
+        drone["DroneState"]["Battery"] = float(
+            drone["DroneState"]["Battery"]) - 0.25
 
     if float(battery_level) == 20.0:
         drone["DroneState"]["Status"] = "Inactive"
         drone["DroneState"]["Battery"] = int(
-            drone["DroneState"]["Battery"]) -1
+            drone["DroneState"]["Battery"]) - 1
 
         dronelog = gen_DroneLog("Drone %s" % (str(
             drone_identifier),), "battery Low %s, changing to Inactive state" % (str(drone["DroneState"]["Battery"])))
@@ -169,10 +170,11 @@ def handle_drone_battery(drone):
 # Distance related functions
 def get_new_direction_for_drone(current_direction):
     """Return a new direction for drone."""
-    directions = ["N","E", "S", "W"]
-    new_index = (directions.index(current_direction)+ 1) % len(directions)
+    directions = ["N", "E", "S", "W"]
+    new_index = (directions.index(current_direction) + 1) % len(directions)
 
     return directions[new_index]
+
 
 def calculate_dis_travelled(speed, time):
     """Calculate the distance travelled(in Km) in a give amount of time(s)."""
@@ -219,7 +221,8 @@ def handle_drone_position(drone):
         distance_travelled = calculate_dis_travelled(drone_speed, LOOP_TIME)
         drone_direction = str(drone["DroneState"]["Direction"])
         drone_identifier = drone["DroneID"]
-        drone = update_drone_position(drone, distance_travelled, drone_direction)
+        drone = update_drone_position(
+            drone, distance_travelled, drone_direction)
 
         if(drone["DroneState"]["Direction"] != drone_direction):
 
@@ -228,7 +231,7 @@ def handle_drone_position(drone):
             send_dronelog(dronelog)
 
             http_api_log = gen_HttpApiLog("Drone %s" % (str(drone_identifier)),
-                                      "PUT DroneLog", "Controller")
+                                          "PUT DroneLog", "Controller")
             send_http_api_log(http_api_log)
 
     return drone
@@ -387,7 +390,7 @@ def main():
             update_datastream(datastream)
 
     # call main() again in LOOP_TIME
-    threading.Timer(1, main).start()
+    threading.Timer(LOOP_TIME, main).start()
 
 
 if __name__ == "__main__":
