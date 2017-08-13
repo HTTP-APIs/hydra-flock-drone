@@ -170,9 +170,9 @@ def handle_drone_battery(drone):
 def get_new_direction_for_drone(current_direction):
     """Return a new direction for drone."""
     directions = ["N", "E", "S", "W"]
-    new_index = (directions.index(current_direction) + 1) % len(directions)
+    directions.pop(directions.index(current_direction))
 
-    return directions[new_index]
+    return random.choice(directions)
 
 
 def calculate_dis_travelled(speed, time):
@@ -255,18 +255,15 @@ def gen_grid_anomaly(drone):
     drone_location = tuple(float(a)
                            for a in drone["DroneState"]["Position"].split(","))
 
-    xtile, ytile = deg2num(drone_location[0], drone_location[1])
+    xtile, ytile = deg2num(drone_location[0], drone_location[1], 17)
 
-    ## Test for anomaly genration test = 5x + 7y + 11
-    test = (5*int(xtile)) + (7*(ytile)) + 11
-    print("ANOMALY GRID TEST", test, test%5, test%3)
+    ## Test for anomaly genration test = 5x + 7y
+    test = (5*int(xtile)) + (7*(ytile))
+    print("ANOMALY GRID TEST", test, test%5, test%7)
 
-    if test % 5 == 0:
-        ## if mod 5 == 0 then probability of anomaly = 4/5
-        option = random.choice([True, True, True, False, False])
-    elif test % 6 ==0:
-        ## if mod 6 == 0 then probability of anomaly = 3/5
-        option = random.choice([True, True, False, False, False])
+    if test % 5 == 0 or test % 7 ==0:
+        ## if mod 5 == 0 or mod 7 ==0 then probability of anomaly = 1/2
+        option = random.choice([True, True, False, False, False, True])
     else:
         option = False
 

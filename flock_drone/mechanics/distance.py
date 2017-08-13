@@ -90,7 +90,7 @@ def get_distance_between_coordinates(a, b):
     return haversine(a, b)
 
 
-def deg2num(lat_deg, lon_deg, zoom = 16):
+def deg2num(lat_deg, lon_deg, zoom = 12):
     """Convert latitute and longitude to map tile index."""
     lat_rad = math.radians(lat_deg)
     n = 2.0 ** zoom
