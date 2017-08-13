@@ -299,20 +299,31 @@ def handle_anomaly(drone):
             # if reached destination
             print("Drone reached destination")
             dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"])),
-                                    "reached anomaly location")
+                                    "reached anomaly location, scanning")
             send_dronelog(dronelog)
+            ## Check if anomaly exists at that location
+            confirm_anomaly = gen_grid_anomaly(drone)
+            if confirm_anomaly is not None:
+                anomaly["Status"] = "Positive"
 
-            anomaly["Status"] = "Confirmed"
+                dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"])),
+                                        "detected POSITIVE anomaly.")
+                send_dronelog(dronelog)
+
+            else:
+                anomaly["Status"] = "Negative"
+
+                dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"])),
+                                        "detected NEGATIVE anomaly.")
+                send_dronelog(dronelog)
+
             print("Updating anomaly locally")
             update_anomaly_locally(anomaly, drone["DroneID"])
+
             print("Updating anomaly at controller")
             update_anomaly_at_controller(
                 anomaly, anomaly["AnomalyID"], drone["DroneID"])
-            print("Anomaly Confirmed")
-
-            dronelog = gen_DroneLog("Drone %s" % (str(drone["DroneID"])),
-                                    "Task completed! Returning to active state.")
-            send_dronelog(dronelog)
+            print("Anomaly confirmation done")
 
             drone["DroneState"]["Status"] = "Active"
 
