@@ -18,7 +18,7 @@ from flock_drone.mechanics.logs import (send_dronelog, send_http_api_log,
 
 from flock_drone.mechanics.datastream import gen_Datastream, update_datastream, send_datastream
 from flock_drone.mechanics.anomaly import gen_Anomaly, send_anomaly, get_anomaly, update_anomaly_at_controller, update_anomaly_locally
-from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, gen_pos_limits_from_square_path, is_valid_location, drone_reached_destination, get_direction
+from flock_drone.mechanics.distance import get_new_coordinates, gen_square_path, deg2num, gen_pos_limits_from_square_path, is_valid_location, drone_reached_destination, get_direction
 from flock_drone.mechanics.commands import get_command_collection, get_command, delete_commands
 
 # Drone main Loop time settings
@@ -31,7 +31,6 @@ CONTROLLER_LOC = tuple(float(x)
 DRONE_BOUNDS = gen_pos_limits_from_square_path(
     gen_square_path(CONTROLLER_LOC, 10))
 
-ITERATOR = 0
 
 # Command related functions
 
@@ -251,18 +250,30 @@ def gen_abnormal_sensor_data():
 
 
 # Anomaly related functions
-def gen_random_anomaly(drone):
-    """Generate an anomaly at random."""
-    global ITERATOR
-    ITERATOR += 1
-    # 1/3 chance of anomaly every ten iterations
-    if ITERATOR % 10 == 0:
-        ITERATOR = 0
-        option = random.choice([True, False, False])
-        if option:
-            anomaly = gen_Anomaly(
-                drone["DroneState"]["Position"], drone["DroneID"])
-            return anomaly
+def gen_grid_anomaly(drone):
+    """Generate an anomaly using drone location and a set of probabilities."""
+    drone_location = tuple(float(a)
+                           for a in drone["DroneState"]["Position"].split(","))
+
+    xtile, ytile = deg2num(drone_location[0], drone_location[1])
+
+    ## Test for anomaly genration test = 5x + 7y
+    test = (5*int(xtile)) + (7*(ytile))
+    print("ANOMALY GRID TEST", test, test%5, test%3)
+
+    if test % 5 == 0:
+        ## if mod 5 == 0 then probability of anomaly = 4/5
+        option = random.choice([True, True, True, True, False])
+    elif test % 6 ==0:
+        ## if mod 6 == 0 then probability of anomaly = 3/5
+        option = random.choice([True, True, True, False, False])
+    else:
+        option = False
+
+    if option:
+        anomaly = gen_Anomaly(
+            drone["DroneState"]["Position"], drone["DroneID"])
+        return anomaly
     return None
 
 
@@ -363,7 +374,7 @@ def main():
             drone = handle_drone_low_battery(drone)
 
         elif is_active(drone):
-            anomaly = gen_random_anomaly(drone)
+            anomaly = gen_grid_anomaly(drone)
             if anomaly is not None:
                 print("New anomaly created")
                 send_anomaly(anomaly, drone_identifier)
@@ -390,7 +401,8 @@ def main():
             update_datastream(datastream)
 
     # call main() again in LOOP_TIME
-    threading.Timer(LOOP_TIME, main).start()
+    # threading.Timer(LOOP_TIME, main).start()
+    threading.Timer(3, main).start()
 
 
 if __name__ == "__main__":
