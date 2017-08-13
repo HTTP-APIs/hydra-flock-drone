@@ -257,16 +257,16 @@ def gen_grid_anomaly(drone):
 
     xtile, ytile = deg2num(drone_location[0], drone_location[1])
 
-    ## Test for anomaly genration test = 5x + 7y
-    test = (5*int(xtile)) + (7*(ytile))
+    ## Test for anomaly genration test = 5x + 7y + 11
+    test = (5*int(xtile)) + (7*(ytile)) + 11
     print("ANOMALY GRID TEST", test, test%5, test%3)
 
     if test % 5 == 0:
         ## if mod 5 == 0 then probability of anomaly = 4/5
-        option = random.choice([True, True, True, True, False])
+        option = random.choice([True, True, True, False, False])
     elif test % 6 ==0:
         ## if mod 6 == 0 then probability of anomaly = 3/5
-        option = random.choice([True, True, True, False, False])
+        option = random.choice([True, True, False, False, False])
     else:
         option = False
 
