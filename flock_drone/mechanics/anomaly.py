@@ -49,20 +49,18 @@ def get_anomaly():
 def send_anomaly(anomaly, drone_identifier):
     """Send the detected anomaly to the central server."""
     post_anomaly = RES_CS.find_suitable_operation(
-        SCHEMA.AddAction, CENTRAL_SERVER.Anomaly)
+        operation_type = SCHEMA.AddAction, input_type = CENTRAL_SERVER.Anomaly)
     resp, body = post_anomaly(anomaly)
-
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
     print("Anomaly added successfully.")
     body = json.loads(body.decode('utf-8'))
-
     http_api_log = gen_HttpApiLog("Drone %s" % (
         str(drone_identifier)), "PUT Anomaly", "Controller")
     send_http_api_log(http_api_log)
 
     try:
         # Get the anomaly_id from body
-        anomaly_id = body[list(body.keys())[0]].split("=")[-1]
+        anomaly_id = body[list(body.keys())[0]].split(" ")[3]
         print("ID assigned to anomaly is", anomaly_id)
         # Update the anomalyID at central controller
         anomaly["AnomalyID"] = anomaly_id
