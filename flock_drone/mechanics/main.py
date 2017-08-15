@@ -78,7 +78,7 @@ def update_drone(drone):
             "Connection Refused! Please check the drone server.")
 
     http_api_log = gen_HttpApiLog("Drone %s" % (
-        str(drone_identifier)), "POST DroneState", "Localhost")
+        str(drone_identifier)), "POST Drone State", "Localhost")
     send_http_api_log(http_api_log)
 
 

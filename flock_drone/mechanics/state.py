@@ -34,7 +34,7 @@ def update_state(state):
         state.pop("DroneID", None)
 
         # Update the drone state
-        drone["DroneState"] = state
+        drone["State"] = state
         update_drone(drone)
         print("Drone state updated successfully.")
     else:
@@ -44,7 +44,7 @@ def update_state(state):
 def get_state():
     """Get the current drone state from the drone server."""
     drone = get_drone()
-    drone_state = drone["DroneState"]
+    drone_state = drone["State"]
     drone_state["DroneID"] = drone["DroneID"]
 
     return drone_state

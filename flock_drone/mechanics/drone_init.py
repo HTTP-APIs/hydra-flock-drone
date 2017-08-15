@@ -20,7 +20,7 @@ def init_drone_locally():
     drone = get_drone_default()
     location = get_controller_location()["Location"]
     print(location)
-    drone["DroneState"]["Position"] = location
+    drone["State"]["Position"] = location
     add_drone_locally(drone)
     print("Drone initalized locally!")
 
@@ -103,7 +103,7 @@ def init_datastream_locally():
     """Initialize the datasteam locally."""
     drone = get_drone()
     id_ = drone["DroneID"]
-    position = drone["DroneState"]["Position"]
+    position = drone["State"]["Position"]
     datastream = gen_Datastream("0", position, id_)
     add_datastream(datastream)
     print("Datastream initialized locally")

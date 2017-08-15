@@ -133,8 +133,8 @@ def calculate_drone_range(speed, loop_time=15):
 def drone_reached_destination(drone, destination):
     """Check if the drone has reached its destination."""
     drone_position = tuple(float(a)
-                           for a in drone["DroneState"]["Position"].split(","))
-    drone_range = calculate_drone_range(drone["DroneState"]["Speed"])
+                           for a in drone["State"]["Position"].split(","))
+    drone_range = calculate_drone_range(drone["State"]["Speed"])
 
     # Generate a square bound for destination location
     bounds_square_path = gen_square_path(destination, drone_range)

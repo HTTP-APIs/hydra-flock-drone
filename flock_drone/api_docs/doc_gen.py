@@ -45,7 +45,7 @@ def doc_gen(API, BASE_URL):
     drone = HydraClass("Drone", "Drone", "Class for a drone", endpoint=True)
     # Properties
     drone.add_supported_prop(HydraClassProp(
-        "vocab:State", "DroneState", False, False, True))
+        "vocab:State", "State", False, False, True))
     drone.add_supported_prop(HydraClassProp(
         "http://schema.org/name", "name", False, False, True))
     drone.add_supported_prop(HydraClassProp(
