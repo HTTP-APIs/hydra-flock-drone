@@ -257,12 +257,12 @@ def gen_grid_anomaly(drone):
 
     xtile, ytile = deg2num(drone_location[0], drone_location[1], 17)
 
-    ## Test for anomaly genration test = 5x + 7y
+    ## Test for anomaly genration test = 5x + 7y + 1
     test = (5*int(xtile)) + (7*(ytile)) + 1
     print("ANOMALY GRID TEST", test, test%5, test%7)
 
     if test % 3 == 0 and test % 7 ==0:
-        ## if mod 5 == 0 or mod 7 ==0 then probability of anomaly = 1/2
+        ## if mod 3 == 0 or mod 7 ==0 then probability of anomaly = 1/2
         option = random.choice([True, True, False, False, False, True])
     else:
         option = False
@@ -360,57 +360,60 @@ def handle_drone_low_battery(drone):
 
 def main():
     """Main 15 second time loop for drone mechanics."""
-    print("Retrieving the drone details")
-    drone = get_drone()
-    print(drone)
+    try:
+        print("Retrieving the drone details")
+        drone = get_drone()
+        print(drone)
 
-    if is_not_off(drone):
+        if is_not_off(drone):
 
-        drone_identifier = drone["DroneID"]
-        datastream = None
-        anomaly = get_anomaly()
-        if anomaly is not None:
-            if anomaly["Status"] == "Confirming" and drone["State"]["Status"] == "Active":
-                drone["State"]["Status"] = "Confirming"
-
-        if is_confirming(drone):
-            print("Drone handling anomaly")
-            drone = handle_anomaly(drone)
-
-        elif is_inactive(drone):
-            print("Drone battery low, needs to charge")
-            drone = handle_drone_low_battery(drone)
-
-        elif is_active(drone):
-            anomaly = gen_grid_anomaly(drone)
+            drone_identifier = drone["DroneID"]
+            datastream = None
+            anomaly = get_anomaly()
             if anomaly is not None:
-                print("New anomaly created")
-                send_anomaly(anomaly, drone_identifier)
-                datastream = gen_Datastream(gen_abnormal_sensor_data(
-                ), drone["State"]["Position"], drone_identifier)
-            else:
-                datastream = gen_Datastream(gen_normal_sensor_data(
-                ), drone["State"]["Position"], drone_identifier)
+                if anomaly["Status"] == "Confirming" and drone["State"]["Status"] == "Active":
+                    drone["State"]["Status"] = "Confirming"
 
-        # Handle positions and battery change
-        drone = handle_drone_battery(drone)
-        drone = handle_drone_position(drone)
-        drone = handle_drone_commands(drone)
+            if is_confirming(drone):
+                print("Drone handling anomaly")
+                drone = handle_anomaly(drone)
 
-        # update the drone both locally and on the controller
-        update_drone(drone)
+            elif is_inactive(drone):
+                print("Drone battery low, needs to charge")
+                drone = handle_drone_low_battery(drone)
 
-        print(update_drone_at_controller(drone, drone_identifier))
+            elif is_active(drone):
+                anomaly = gen_grid_anomaly(drone)
+                if anomaly is not None:
+                    print("New anomaly created")
+                    send_anomaly(anomaly, drone_identifier)
+                    datastream = gen_Datastream(gen_abnormal_sensor_data(
+                    ), drone["State"]["Position"], drone_identifier)
+                else:
+                    datastream = gen_Datastream(gen_normal_sensor_data(
+                    ), drone["State"]["Position"], drone_identifier)
 
-        if datastream is not None:
-            # Send datastream to central controller
-            send_datastream(datastream)
-            # Update datastream locally
-            update_datastream(datastream)
+            # Handle positions and battery change
+            drone = handle_drone_battery(drone)
+            drone = handle_drone_position(drone)
+            drone = handle_drone_commands(drone)
+
+            # update the drone both locally and on the controller
+            update_drone(drone)
+
+            print(update_drone_at_controller(drone, drone_identifier))
+
+            if datastream is not None:
+                # Send datastream to central controller
+                send_datastream(datastream)
+                # Update datastream locally
+                update_datastream(datastream)
+
+    except Exception as e:
+        print(e)
 
     # call main() again in LOOP_TIME
     threading.Timer(LOOP_TIME, main).start()
-    # threading.Timer(3, main).start()
 
 
 if __name__ == "__main__":
