@@ -16,6 +16,7 @@ from sqlalchemy.orm import sessionmaker
 from hydrus.data.db_models import Base
 from flock_drone.settings import DB_URL, PORT, HYDRUS_SERVER_URL, API_NAME
 from flock_drone.api_docs.doc import doc
+from gevent.wsgi import WSGIServer
 
 
 if __name__ == "__main__":
@@ -48,5 +49,6 @@ if __name__ == "__main__":
         with set_hydrus_server_url(app, HYDRUS_SERVER_URL):
             # Set the Database session
             with set_session(app, session):
-                # Start the Hydrus app
-                app.run(host='127.0.0.1', debug=True, port=PORT)
+                http_server = WSGIServer(('', PORT), app)
+                print("Server running")
+                http_server.serve_forever()
