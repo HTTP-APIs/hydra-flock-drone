@@ -1,4 +1,13 @@
 """Initialize drone."""
+import os
+import sys
+curDir = os.path.dirname(__file__)
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
+sys.path.insert(0, superParentDir)
+
 from flock_drone.mechanics.main import CENTRAL_SERVER, RES_CS, RES_DRONE, DRONE
 from hydra import SCHEMA, Resource
 from flock_drone.mechanics.main import get_drone, get_drone_default, update_drone, get_controller_location, update_drone_at_controller
@@ -11,7 +20,7 @@ def init_drone_locally():
     drone = get_drone_default()
     location = get_controller_location()["Location"]
     print(location)
-    drone["DroneState"]["Position"] = location
+    drone["State"]["Position"] = location
     add_drone_locally(drone)
     print("Drone initalized locally!")
 
@@ -53,7 +62,8 @@ def add_drone(drone):
 def remove_drone(drone_id):
     """Remove previous drone object from the central server."""
     try:
-        i = Resource.from_iri(CENTRAL_SERVER_URL + "/api/DroneCollection" + drone_id)
+        i = Resource.from_iri(CENTRAL_SERVER_URL +
+                              "/api/DroneCollection" + drone_id)
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction, None)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier
@@ -93,7 +103,7 @@ def init_datastream_locally():
     """Initialize the datasteam locally."""
     drone = get_drone()
     id_ = drone["DroneID"]
-    position = drone["DroneState"]["Position"]
+    position = drone["State"]["Position"]
     datastream = gen_Datastream("0", position, id_)
     add_datastream(datastream)
     print("Datastream initialized locally")

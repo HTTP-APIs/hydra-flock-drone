@@ -10,7 +10,7 @@ Flask-RESTful==0.3.6
 haversine==0.4.5
 httplib2==0.10.3
 -e git://github.com/andrejsab/hydra-py.git@ff78005b3ff1902e53b6faacff17498d105cd80a#egg=hydra
--e git://github.com/chrizandr/hydrus.git
+-e git://github.com/HTTP-APIs/hydrus.git#egg=hydrus
 idna==2.5
 isodate==0.5.4
 itsdangerous==0.24

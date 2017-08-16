@@ -1,6 +1,10 @@
 """Settings for the drone."""
 import os
-
+import sys
+curDir = os.path.dirname(__file__)
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+sys.path.insert(0, parentDir)
 # Database connector
 global DB_URL
 db_path = os.path.join(os.path.dirname(__file__), 'database.db')
@@ -35,7 +39,7 @@ DRONE_DEFAULT = {
     "model": "xyz",
     "MaxSpeed": "130",
     "Sensor": "Temperature",
-    "DroneState": {
+    "State": {
         "@type": "State",
         "Speed": "100",
         "Position": "0,0",

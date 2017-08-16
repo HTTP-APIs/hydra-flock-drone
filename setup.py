@@ -32,4 +32,4 @@ setup(name='hydra-flock-drone',
                         'rdflib-jsonld==0.4.0',
                         'requests==2.18.1',
                         'haversine==0.4.5']
-)
+      )

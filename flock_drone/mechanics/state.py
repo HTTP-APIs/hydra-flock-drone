@@ -1,5 +1,14 @@
 """Operation related to Drone state POST operations."""
 # from flock_drone.mechanics.main import RES_CS
+import os
+import sys
+curDir = os.path.dirname(__file__)
+# this will return parent directory.
+parentDir = os.path.abspath(os.path.join(curDir, os.pardir))
+# this will return parent directory.
+superParentDir = os.path.abspath(os.path.join(parentDir, os.pardir))
+sys.path.insert(0, superParentDir)
+
 from flock_drone.mechanics.main import get_drone, update_drone
 
 
@@ -25,7 +34,7 @@ def update_state(state):
         state.pop("DroneID", None)
 
         # Update the drone state
-        drone["DroneState"] = state
+        drone["State"] = state
         update_drone(drone)
         print("Drone state updated successfully.")
     else:
@@ -35,7 +44,7 @@ def update_state(state):
 def get_state():
     """Get the current drone state from the drone server."""
     drone = get_drone()
-    drone_state = drone["DroneState"]
+    drone_state = drone["State"]
     drone_state["DroneID"] = drone["DroneID"]
 
     return drone_state
