@@ -7,6 +7,8 @@ click==6.7
 Flask==0.11
 Flask-Cors==3.0.3
 Flask-RESTful==0.3.6
+gevent==1.2.2
+greenlet==0.4.12
 haversine==0.4.5
 httplib2==0.10.3
 -e git://github.com/andrejsab/hydra-py.git@ff78005b3ff1902e53b6faacff17498d105cd80a#egg=hydra
