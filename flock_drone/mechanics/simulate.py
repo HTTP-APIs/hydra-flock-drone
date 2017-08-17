@@ -424,14 +424,15 @@ def main():
         drone = get_drone()
         drone_identifier = drone["DroneID"]
         datastream = None
+        #
+        # ## If drone is in active state or off state handle commands
+        # if is_active(drone) or not is_not_off(drone):
+        #     print("Handling commands")
+        #     drone = handle_drone_commands(drone)
+        #     # print(drone)
 
-        ## If drone is in active state or off state handle commands
-        if is_active(drone) or not is_not_off(drone):
-            print("Handling commands")
-            drone = handle_drone_commands(drone)
-            # print(drone)
-
-
+        # Commands will be executed in any state
+        drone = handle_drone_commands(drone)
 
         if is_not_off(drone):
 
