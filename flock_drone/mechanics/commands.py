@@ -34,14 +34,8 @@ def get_command_collection():
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
     body = json.loads(body.decode('utf-8'))
-    command_list = list()
-    for command in body["members"]:
-        regex = r'/(.*)/(\d)'
-        matchObj = re.match(regex, command["@id"])
-        if matchObj:
-            command_list.append(get_command(matchObj.group(2)))
 
-    return command_list
+    return body["members"]
 
 
 def add_command(command):
