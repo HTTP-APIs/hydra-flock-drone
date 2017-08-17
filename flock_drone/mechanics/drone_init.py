@@ -63,7 +63,7 @@ def remove_drone(drone_id):
     """Remove previous drone object from the central server."""
     try:
         i = Resource.from_iri(CENTRAL_SERVER_URL +
-                              "/api/DroneCollection" + drone_id)
+                              "/api/DroneCollection" + str(drone_id))
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction, None)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier

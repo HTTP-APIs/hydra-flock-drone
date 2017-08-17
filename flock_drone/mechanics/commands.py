@@ -63,20 +63,21 @@ def get_command(id_):
         body.pop("@type")
         return body
     except:
-        return {404: "Resource with Id %s not found!" % (id_,)}
+        return {404: "Resource with Id %s not found!" % (str(id_),)}
 
 
 def delete_command(id_):
     """Delete a command from the collection given command @id attribute."""
     try:
-        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
+        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + str(id_))
         # name = i.value(SCHEMA.name)
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier
         else:
             return "deleted <%s>" % i.identifier
-    except:
+    except Exception as e:
+        print(e)
         return {404: "Resource with Id %s not found!" % (id_,)}
 
 
@@ -87,8 +88,9 @@ def delete_commands(command_ids):
 
 
 if __name__ == "__main__":
-    print(get_command_collection())
+    # print(get_command_collection())
     # state = gen_State(-1000, "50", "North", "1,1", "Active", 100)
     # command = gen_Command(123, state)
     # print(add_command(command))
+    delete
     # print(delete_command("/api/CommandCollection/175"))
