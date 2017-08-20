@@ -78,7 +78,7 @@ def get_command(id_):
 def delete_command(id_):
     """Delete a command from the collection given command @id attribute."""
     try:
-        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + id_)
+        i = Resource.from_iri(DRONE_URL + "/api/CommandCollection/" + str(id_))
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier
@@ -86,7 +86,7 @@ def delete_command(id_):
             return "deleted <%s>" % i.identifier
     except Exception as e:
         print(e)
-        return {404: "Resource with Id %s not found!" % (id_,)}
+        return None
 
 
 def delete_commands(command_ids):
