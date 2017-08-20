@@ -84,7 +84,8 @@ def delete_command(id_):
             return "error deleting <%s>" % i.identifier
         else:
             return "deleted <%s>" % i.identifier
-    except:
+    except Exception as e:
+        print(e)
         return {404: "Resource with Id %s not found!" % (id_,)}
 
 
