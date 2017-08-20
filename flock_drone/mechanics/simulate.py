@@ -456,8 +456,8 @@ def main():
                     datastream = gen_Datastream(gen_normal_sensor_data(
                     ), drone["State"]["Position"], drone_identifier)
 
-        # Handle positions change
-        drone = handle_drone_position(drone)
+            # Handle positions change
+            drone = handle_drone_position(drone)
 
         # update the drone both locally and on the controller
         update_drone(drone)
