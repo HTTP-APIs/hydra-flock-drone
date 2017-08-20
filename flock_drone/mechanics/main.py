@@ -35,14 +35,18 @@ def get_drone_default():
 
 def get_drone():
     """Get the drone object from drone server."""
-    get_drone_ = RES_DRONE.find_suitable_operation(operation_type=None, input_type=None,
-                                                   output_type=DRONE.Drone)
-    resp, body = get_drone_()
-    assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
-    drone = json.loads(body.decode('utf-8'))
-    drone.pop("@id", None)
-    drone.pop("@context", None)
-    return drone
+    try:
+        get_drone_ = RES_DRONE.find_suitable_operation(operation_type=None, input_type=None,
+                                                       output_type=DRONE.Drone)
+        resp, body = get_drone_()
+        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+        drone = json.loads(body.decode('utf-8'))
+        drone.pop("@id", None)
+        drone.pop("@context", None)
+        return drone
+    except Exception as e:
+        print(e)
+        return None
 
 
 def get_controller_location():
@@ -57,9 +61,9 @@ def get_controller_location():
         location_obj.pop("@context")
         location_obj.pop("@type")
         return location_obj
-    except ConnectionRefusedError as e:
+    except Exception as e:
         print(e)
-        print("Failed to use controller location, returning default")
+        print("Failed to use controller location, using default")
         return "0,0"
 
 
@@ -73,9 +77,9 @@ def update_drone(drone):
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
 
         return Resource.from_iri(resp['location'])
-    except ConnectionRefusedError:
-        raise ConnectionRefusedError(
-            "Connection Refused! Please check the drone server.")
+    except Exception as e:
+        print(e)
+        return None
 
     http_api_log = gen_HttpApiLog("Drone %s" % (
         str(drone_identifier)), "POST Drone State", "Localhost")
@@ -92,13 +96,10 @@ def update_drone_at_controller(drone, drone_identifier):
             operation_type=SCHEMA.UpdateAction, input_type=CENTRAL_SERVER.Drone)
         assert operation is not None
         resp, body = operation(drone)
-        print(drone)
         assert resp.status in [200, 201]
     except Exception as e:
         print(e)
-        print(drone, drone_identifier)
-        # print("exception")
-        return {404: "Resource with Id %s not found!" % (id_,)}
+        return None
 
     http_api_log = gen_HttpApiLog("Drone %s" % (
         str(drone_identifier)), "POST Drone", "Controller")
@@ -113,21 +114,3 @@ def ordered(obj):
         return sorted(ordered(x) for x in obj)
     else:
         return obj
-
-
-if __name__ == "__main__":
-
-    print(get_drone())
-    drone = get_drone()
-    drone_identifier = drone["DroneID"]
-    print(drone_identifier)
-    print(update_drone_at_controller(drone, drone_identifier))
-    # print(update_drone(get_drone_default()))
-    # print(get_drone_id())
-    # datastream = gen_datastream(100, "0,0", get_drone_id())
-    # print(update_datastream(datastream))
-    # print(get_datastream())
-    # state = gen_state(-1000, "50", "North", "1,1", "Active", 100)
-    # print(state)
-    # print(update_state(state))
-    # print(get_state())

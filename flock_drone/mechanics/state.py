@@ -1,5 +1,4 @@
 """Operation related to Drone state POST operations."""
-# from flock_drone.mechanics.main import RES_CS
 import os
 import sys
 curDir = os.path.dirname(__file__)
@@ -12,7 +11,7 @@ sys.path.insert(0, superParentDir)
 from flock_drone.mechanics.main import get_drone, update_drone
 
 
-def gen_State(drone_id, battery, direction, position, sensor_status, speed):
+def gen_State(drone_id, battery, direction, position, status, speed):
     """Generate a State objects."""
     state = {
         "@type": "State",
@@ -20,7 +19,7 @@ def gen_State(drone_id, battery, direction, position, sensor_status, speed):
         "Battery": battery,
         "Direction": direction,
         "Position": position,
-        "SensorStatus": sensor_status,
+        "Status": status,
         "Speed": speed,
     }
     return state

@@ -49,7 +49,6 @@ def handle_drone_commands(drone):
             command_id = matchObj.group(2)
             temp_list.append(int(command_id))
     temp_list.sort()
-    print(temp_list)
 
     if len(temp_list) > 0:
         latest_command = get_command(temp_list[-1])
@@ -398,7 +397,6 @@ def handle_drone_low_battery(drone):
         source = tuple(float(a)
                        for a in drone["State"]["Position"].split(","))
         new_direction = get_direction(source, destination)
-        print(new_direction)
         if new_direction != drone["State"]["Direction"]:
             drone["State"]["Direction"] = new_direction
 
@@ -424,18 +422,11 @@ def main():
         drone = get_drone()
         drone_identifier = drone["DroneID"]
         datastream = None
-        #
-        # ## If drone is in active state or off state handle commands
-        # if is_active(drone) or not is_not_off(drone):
-        #     print("Handling commands")
-        #     drone = handle_drone_commands(drone)
-        #     # print(drone)
 
         # Commands will be executed in any state
         drone = handle_drone_commands(drone)
 
         if is_not_off(drone):
-
 
             ## Handle drone battery change
             drone = handle_drone_battery(drone)
@@ -488,6 +479,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # anomaly = gen_Anomaly("0.956901647439813,14.08447265625", "22")
-    # send_anomaly(anomaly, "22")
+    message = """Running Drone simulation main loop."""
+    print(message)
+
     main()
