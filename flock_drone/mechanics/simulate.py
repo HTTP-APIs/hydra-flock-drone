@@ -315,8 +315,8 @@ def gen_grid_anomaly(drone):
 
     xtile, ytile = deg2num(drone_location[0], drone_location[1], 17)
 
-    ## Test for anomaly genration test = 5x + 7y + 1
-    test = (5*int(xtile)) + (7*(ytile)) + 1
+    ## Test for anomaly genration test = 5x + 7y + 2
+    test = (5*int(xtile)) + (7*(ytile)) + 2
     print("ANOMALY GRID TEST", test, test%5, test%7)
 
     if test % 35 ==0:
