@@ -90,7 +90,7 @@ def get_distance_between_coordinates(a, b):
     return haversine(a, b)
 
 
-def deg2num(lat_deg, lon_deg, zoom = 12):
+def deg2num(lat_deg, lon_deg, zoom=12):
     """Convert latitute and longitude to map tile index."""
     lat_rad = math.radians(lat_deg)
     n = 2.0 ** zoom
@@ -144,16 +144,3 @@ def drone_reached_destination(drone, destination):
     if is_valid_location(drone_position, destination_bounds):
         return True
     return False
-
-
-if __name__ == "__main__":
-    a = (-30.040397656836609, -30.03373871559225)
-    print("Initial Coordinates", a)
-    b = get_new_coordinates(a, 1, "N")
-    print("Final Coordinates", b)
-    distance_between_coordinates = get_distance_between_coordinates(a, b)
-    print("Distance_between_coordinates", distance_between_coordinates)
-    print("\n\n")
-    print(deg2num(-10.040397656836609, -55.03373871559225, 13))
-
-    print(gen_pos_limits_from_square_path(gen_square_path(a, 10)))

@@ -38,18 +38,32 @@ DRONE_BOUNDS = gen_pos_limits_from_square_path(
 def handle_drone_commands(drone):
     """Handle the commands on the drone server and update drone accordingly."""
     # Using the latest command, not following previously stored ones, server will ensure order
+    drone_identifier = drone["DroneID"]
     commands = get_command_collection()
-    command_ids = [x["@id"] for x in commands]
+    command_identifiers = [x["@id"] for x in commands]
     temp_list = list()
-    for id_ in command_ids:
+    for id_ in command_identifiers:
         regex = r'/(.*)/(\d*)'
         matchObj = re.match(regex, id_)
         if matchObj:
-            temp_list.append(matchObj.group(2))
+            command_id = matchObj.group(2)
+            temp_list.append(int(command_id))
     temp_list.sort()
 
     if len(temp_list) > 0:
         latest_command = get_command(temp_list[-1])
+
+        ## Generate and send Dronelog
+        dronelog = gen_DroneLog("Drone %s" % (str(
+            drone_identifier),), "executing command with id %s" % (str(temp_list[-1])))
+        send_dronelog(dronelog)
+
+        ## Generate and send HttpApiLog
+        http_api_log = gen_HttpApiLog("Drone %s" % (str(drone["DroneID"])),
+                                                  "PUT DroneLog", "Controller")
+        send_http_api_log(http_api_log)
+
+
         # Execute the latest command
         drone = execute_command(latest_command, drone)
         # Delete after execution
@@ -60,8 +74,52 @@ def handle_drone_commands(drone):
 
 def execute_command(command, drone):
     """Execute the command on the drone."""
-    if command["DroneID"] == drone["DroneID"]:
-        drone["State"] = command["State"]
+    drone_identifier = drone["DroneID"]
+    if command["DroneID"] == drone_identifier:
+        for prop in command["State"]:
+            if prop != "@type" and prop in drone["State"].keys():
+                prop_val = command["State"][prop]
+
+                # Handle direction prop
+                if prop == "Direction":
+                    drone["State"]["Direction"] =prop_val
+
+                    ## Generate and send Dronelog
+                    dronelog = gen_DroneLog("Drone %s" % (str(
+                        drone_identifier),), "changed direction to %s after command execution." % (str(prop_val)))
+                    send_dronelog(dronelog)
+
+
+                # Handle speed prop
+                if prop == "Speed":
+                    if float(prop_val) <= float(drone["MaxSpeed"]):
+                        drone["State"]["Speed"] = prop_val
+                    else:
+                        drone["State"]["Speed"] = drone["MaxSpeed"]
+
+
+                    ## Generate and send Dronelog
+                    dronelog = gen_DroneLog("Drone %s" % (str(
+                        drone_identifier),), "changed speed to %s after command execution." % (str(drone["State"]["Speed"])))
+                    send_dronelog(dronelog)
+
+                # Handle status prop
+                if prop == "Status":
+                    if prop_val in ["Active", "Off"]:
+                        drone["State"]["Status"] = prop_val
+
+
+                        ## Generate and send Dronelog
+                    dronelog = gen_DroneLog("Drone %s" % (str(
+                        drone_identifier),), "changed status to %s after command execution." % (str(prop_val)))
+                    send_dronelog(dronelog)
+
+
+    # Generate and Send HttpApiLog
+    http_api_log = gen_HttpApiLog("Drone %s" % (str(drone["DroneID"])),
+                                          "PUT DroneLog", "Controller")
+    send_http_api_log(http_api_log)
+
 
     return drone
 
@@ -119,7 +177,7 @@ def discharge_drone_battery(drone):
             str(drone_identifier)), "PUT DroneLog", "Controller")
         send_http_api_log(http_api_log)
 
-    elif float(battery_level) == 4.0:
+    elif float(battery_level) <= 4.0:
         # Battery level critical change drone status to OFF
         drone["State"]["Status"] = "Off"
 
@@ -257,13 +315,13 @@ def gen_grid_anomaly(drone):
 
     xtile, ytile = deg2num(drone_location[0], drone_location[1], 17)
 
-    ## Test for anomaly genration test = 5x + 7y + 1
-    test = (5*int(xtile)) + (7*(ytile)) + 1
+    ## Test for anomaly genration test = 5x + 7y + 2
+    test = (5*int(xtile)) + (7*(ytile)) + 2
     print("ANOMALY GRID TEST", test, test%5, test%7)
 
-    if test % 5 == 0 or test % 7 ==0:
-        ## if mod 5 == 0 or mod 7 ==0 then probability of anomaly = 1/3
-        option = random.choice([True, True, False, False, False, False])
+    if test % 35 ==0:
+        ## if mod 35 == 0 then probability of anomaly = 1/2
+        option = random.choice([True, True, False, False, False, True])
     else:
         option = False
 
@@ -339,7 +397,6 @@ def handle_drone_low_battery(drone):
         source = tuple(float(a)
                        for a in drone["State"]["Position"].split(","))
         new_direction = get_direction(source, destination)
-        print(new_direction)
         if new_direction != drone["State"]["Direction"]:
             drone["State"]["Direction"] = new_direction
 
@@ -363,12 +420,18 @@ def main():
     try:
         print("Retrieving the drone details")
         drone = get_drone()
-        print(drone)
+        drone_identifier = drone["DroneID"]
+        datastream = None
+
+        # Commands will be executed in any state
+        drone = handle_drone_commands(drone)
 
         if is_not_off(drone):
 
-            drone_identifier = drone["DroneID"]
-            datastream = None
+            ## Handle drone battery change
+            drone = handle_drone_battery(drone)
+
+            ## Handle drone general behaviour
             anomaly = get_anomaly()
             if anomaly is not None:
                 if anomaly["Status"] == "Confirming" and drone["State"]["Status"] == "Active":
@@ -393,30 +456,30 @@ def main():
                     datastream = gen_Datastream(gen_normal_sensor_data(
                     ), drone["State"]["Position"], drone_identifier)
 
-            # Handle positions and battery change
-            drone = handle_drone_battery(drone)
+            # Handle positions change
             drone = handle_drone_position(drone)
-            drone = handle_drone_commands(drone)
 
-            # update the drone both locally and on the controller
-            update_drone(drone)
+        # update the drone both locally and on the controller
+        update_drone(drone)
 
-            print(update_drone_at_controller(drone, drone_identifier))
+        update_drone_at_controller(drone, drone_identifier)
 
-            if datastream is not None:
-                # Send datastream to central controller
-                send_datastream(datastream)
-                # Update datastream locally
-                update_datastream(datastream)
+        if datastream is not None:
+            # Send datastream to central controller
+            send_datastream(datastream)
+            # Update datastream locally
+            update_datastream(datastream)
 
     except Exception as e:
         print(e)
 
-    # call main() again in LOOP_TIME
-    threading.Timer(LOOP_TIME, main).start()
+    finally:
+        # call main() again in LOOP_TIME
+        threading.Timer(LOOP_TIME, main).start()
 
 
 if __name__ == "__main__":
-    # anomaly = gen_Anomaly("0.956901647439813,14.08447265625", "22")
-    # send_anomaly(anomaly, "22")
+    message = """Running Drone simulation main loop."""
+    print(message)
+
     main()

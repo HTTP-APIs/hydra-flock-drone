@@ -19,7 +19,7 @@ def init_drone_locally():
     """Initialize the drone locally with Negative identifier."""
     drone = get_drone_default()
     location = get_controller_location()["Location"]
-    print(location)
+
     drone["State"]["Position"] = location
     add_drone_locally(drone)
     print("Drone initalized locally!")
@@ -33,11 +33,10 @@ def add_drone_locally(drone):
         resp, body = add_drone_(drone)
         assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
         drone_id = resp['location'].split("/")[-1]
-        print(drone_id)
+
         return drone_id
-    except (ConnectionRefusedError, KeyError) as e:
+    except Exception as e:
         print(e)
-        print("Connection Refused, Please check the central controller.")
         print("Using default id instead")
         return -1000
 
@@ -52,9 +51,8 @@ def add_drone(drone):
         drone_id = resp['location'].split("/")[-1]
         print(drone_id)
         return drone_id
-    except (ConnectionRefusedError, KeyError) as e:
+    except Exception as e:
         print(e)
-        print("Connection Refused, Please check the central controller.")
         print("Using default id instead")
         return -1000
 
@@ -63,7 +61,7 @@ def remove_drone(drone_id):
     """Remove previous drone object from the central server."""
     try:
         i = Resource.from_iri(CENTRAL_SERVER_URL +
-                              "/api/DroneCollection" + drone_id)
+                              "/api/DroneCollection" + str(drone_id))
         resp, _ = i.find_suitable_operation(SCHEMA.DeleteAction, None)()
         if resp.status // 100 != 2:
             return "error deleting <%s>" % i.identifier
@@ -81,6 +79,7 @@ def init_drone():
 
     drone = get_drone()
     drone_id = drone["DroneID"]
+
     # If drone has default negative id initialize else remove old drone and then inintialize.
     if int(drone_id) == -1000:
         drone_id = int(add_drone(drone))
@@ -89,8 +88,8 @@ def init_drone():
         remove_drone(drone_id)
         print("Previous drone successfully deleted from the central server.")
         drone_id = int(add_drone(drone))
-    print(drone_id)
-    # Update the drone on localhost
+
+    # Update the drone at localhost
     drone["DroneID"] = drone_id
 
     update_drone(drone)

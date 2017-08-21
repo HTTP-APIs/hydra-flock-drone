@@ -49,7 +49,7 @@ def get_anomaly():
 def send_anomaly(anomaly, drone_identifier):
     """Send the detected anomaly to the central server."""
     post_anomaly = RES_CS.find_suitable_operation(
-        operation_type = SCHEMA.AddAction, input_type = CENTRAL_SERVER.Anomaly)
+        operation_type=SCHEMA.AddAction, input_type=CENTRAL_SERVER.Anomaly)
     resp, body = post_anomaly(anomaly)
     assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
     print("Anomaly added successfully.")
@@ -67,7 +67,7 @@ def send_anomaly(anomaly, drone_identifier):
         update_anomaly_at_controller(anomaly, anomaly_id, drone_identifier)
     except Exception as e:
         print(e)
-        pass
+        return None
 
     dronelog = gen_DroneLog("Drone %s" % (str(drone_identifier),),
                             "detected anomaly at %s" % (str(anomaly["Location"])))
@@ -86,9 +86,10 @@ def update_anomaly_at_controller(anomaly, anomaly_id, drone_identifier):
         print(anomaly)
         resp, body = operation(anomaly)
         assert resp.status in [200, 201]
+        return resp
     except Exception as e:
         print(e)
-        return {404: "Resource with Id %s not found!" % (id_,)}
+        return None
 
     http_api_log = gen_HttpApiLog("Drone %s" % (
         str(drone_identifier)), "POST Anomaly", "Controller")
@@ -107,15 +108,11 @@ def update_anomaly_locally(anomaly, drone_identifier):
         print(anomaly)
         resp, body = operation(anomaly)
         assert resp.status in [200, 201]
+        return resp
     except Exception as e:
         print(e)
-        return {404: "Resource with Id %s not found!" % (id_,)}
+        return None
 
     http_api_log = gen_HttpApiLog("Drone %s" % (
         str(drone_identifier)), "POST Anomaly", "Localhost")
     send_http_api_log(http_api_log)
-
-
-if __name__ == "__main__":
-    anomaly = gen_Anomaly("0,0", "-1000")
-    send_anomaly(anomaly, "-1000")

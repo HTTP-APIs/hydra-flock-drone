@@ -39,23 +39,31 @@ def gen_HttpApiLog(source, action, target):
 
 def send_dronelog(dronelog):
     """Post the drone log to the central server."""
-    post_dronelog = RES_CS.find_suitable_operation(
-        SCHEMA.AddAction, CENTRAL_SERVER.DroneLog)
-    resp, body = post_dronelog(dronelog)
+    try:
+        post_dronelog = RES_CS.find_suitable_operation(
+            SCHEMA.AddAction, CENTRAL_SERVER.DroneLog)
+        resp, body = post_dronelog(dronelog)
 
-    assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
-    new_dronelog = Resource.from_iri(resp['location'])
-    print("Drone Log successfully.")
-    return new_dronelog
+        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+        new_dronelog = Resource.from_iri(resp['location'])
+        print("Drone Log successfully.")
+        return new_dronelog
+    except Exception as e:
+        print(e)
+        return None
 
 
 def send_http_api_log(http_api_log):
     """Post the drone http Api Log to the central server."""
-    post_http_api_log = RES_CS.find_suitable_operation(
-        SCHEMA.AddAction, CENTRAL_SERVER.HttpApiLog)
-    resp, body = post_http_api_log(http_api_log)
+    try:
+        post_http_api_log = RES_CS.find_suitable_operation(
+            SCHEMA.AddAction, CENTRAL_SERVER.HttpApiLog)
+        resp, body = post_http_api_log(http_api_log)
 
-    assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
-    new_http_api_log = Resource.from_iri(resp['location'])
-    print("Http Api Log posted successfully.")
-    return new_http_api_log
+        assert resp.status in [200, 201], "%s %s" % (resp.status, resp.reason)
+        new_http_api_log = Resource.from_iri(resp['location'])
+        print("Http Api Log posted successfully.")
+        return new_http_api_log
+    except Exception as e:
+        print(e)
+        return None
