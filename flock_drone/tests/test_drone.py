@@ -65,7 +65,7 @@ class TestDroneRequests(unittest.TestCase):
 
     def test_request_datastream(self):
         """Test the /Datastream endpoint."""
-        datastream = gen_Datastream(100, "0,0", -1000)
+        datastream = gen_Datastream('100', "0,0", '-1000')
 
         request_get = requests.get(DRONE_URL + 'api/Datastream')
         request_put = requests.put(
@@ -81,8 +81,8 @@ class TestDroneRequests(unittest.TestCase):
 
     def test_request_command_collection(self):
         """Test the /CommandCollection endpoint."""
-        state = gen_State(-1000, "50", "North", "1,1", "Active", 100)
-        command = gen_Command(123, state)
+        state = gen_State('-1000', "50", "North", "1,1", "Active", '100')
+        command = gen_Command('123', state)
 
         request_get = requests.get(DRONE_URL + 'api/CommandCollection')
         request_put = requests.put(
@@ -97,18 +97,32 @@ class TestDroneRequests(unittest.TestCase):
 
     def test_request_command_collection_wrong_type_put(self):
         """Test the /CommandCollection endpoint PUT with wrong type object."""
-        state = gen_State(-1000, "50", "North", "1,1", "Active", 100)
-        command = gen_Command(123, state)
+        state = gen_State('-1000', "50", "North", "1,1", "Active", '100')
+        command = gen_Command('123', state)
         command["@type"] = "Dummy"
 
         request_put = requests.put(
             DRONE_URL + 'api/CommandCollection', data=json.dumps(command))
         assert request_put.status_code == 400
 
+    def test_command_data(self):
+        """Test if command data submitted is same as command received back."""
+        state = gen_State('-1000', "50", "North", "1,1", "Active", '100')
+        command = gen_Command('123', state)
+        request_put = requests.put(
+            DRONE_URL + 'api/CommandCollection/', data=json.dumps(command))
+
+        id_ = request_put.headers["Location"].split("/")[-1]
+        request_get = requests.get(DRONE_URL + 'api/CommandCollection/' + id_)
+        received_command = request_get.json()
+        received_command.pop("@id", None)
+        received_command.pop("@context", None)
+        assert ordered(command) == ordered(received_command)
+
     def test_drone_data(self):
         """Test if drone data submitted is same as drone received back."""
         drone = get_drone_default()
-        request_post = requests.post(
+        request_put = requests.put(
             DRONE_URL + 'api/Drone', data=json.dumps(drone))
 
         request_get = requests.get(DRONE_URL + 'api/Drone')
@@ -120,7 +134,7 @@ class TestDroneRequests(unittest.TestCase):
     def test_datastream_data(self):
         """Test if datastream data submitted is same as datastream received back."""
         datastream = gen_Datastream("100", "0,0", "-1000")
-        request_post = requests.post(
+        request_put = requests.put(
             DRONE_URL + 'api/Datastream', data=json.dumps(datastream))
 
         request_get = requests.get(DRONE_URL + 'api/Datastream')
