@@ -110,9 +110,10 @@ class TestDroneRequests(unittest.TestCase):
         state = gen_State('-1000', "50", "North", "1,1", "Active", '100')
         command = gen_Command('123', state)
         request_put = requests.put(
-            DRONE_URL + 'api/CommandCollection/100', data=json.dumps(command))
+            DRONE_URL + 'api/CommandCollection/', data=json.dumps(command))
 
-        request_get = requests.get(DRONE_URL + 'api/CommandCollection/100')
+        id_ = request_put.headers["Location"].split("/")[-1]
+        request_get = requests.get(DRONE_URL + 'api/CommandCollection/' + id_)
         received_command = request_get.json()
         received_command.pop("@id", None)
         received_command.pop("@context", None)
