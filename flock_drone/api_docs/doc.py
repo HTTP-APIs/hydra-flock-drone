@@ -52,81 +52,53 @@ doc = {
     "possibleStatus": [],
     "supportedClass": [
         {
-            "@id": "vocab:Datastream",
+            "@id": "vocab:State",
             "@type": "hydra:Class",
-            "description": "Class for a data entry from drone sensors",
-            "supportedOperation": [
-                {
-                    "@type": "hydra:Operation",
-                    "expects": "null",
-                    "method": "GET",
-                    "possibleStatus": [
-                        {
-                            "description": "Datastream not found",
-                            "statusCode": 404
-                        },
-                        {
-                            "description": "Datastream returned",
-                            "statusCode": 200
-                        }
-                    ],
-                    "returns": "vocab:Datastream",
-                    "title": "GetDatastream"
-                },
-                {
-                    "@type": "http://schema.org/UpdateAction",
-                    "expects": "vocab:Datastream",
-                    "method": "POST",
-                    "possibleStatus": [
-                        {
-                            "description": "Datastream updated",
-                            "statusCode": 200
-                        }
-                    ],
-                    "returns": "null",
-                    "title": "UpdateDatastream"
-                },
-                {
-                    "@type": "http://schema.org/AddAction",
-                    "expects": "vocab:Datastream",
-                    "method": "PUT",
-                    "possibleStatus": [
-                        {
-                            "description": "Datastream added",
-                            "statusCode": 200
-                        }
-                    ],
-                    "returns": "null",
-                    "title": "AddDatastream"
-                }
-            ],
+            "description": "Class for drone state objects",
+            "supportedOperation": [],
             "supportedProperty": [
                 {
                     "@type": "SupportedProperty",
-                    "property": "http://schema.org/QuantitativeValue",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "Temperature",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/identifier",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "DroneID",
+                    "property": "http://auto.schema.org/speed",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Speed",
                     "writeonly": "false"
                 },
                 {
                     "@type": "SupportedProperty",
                     "property": "http://schema.org/geo",
-                    "readonly": "false",
-                    "required": "true",
+                    "readonly": "true",
+                    "required": "false",
                     "title": "Position",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/Property",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Direction",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/fuelCapacity",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Battery",
+                    "writeonly": "true"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "https://schema.org/status",
+                    "readonly": "true",
+                    "required": "false",
+                    "title": "Status",
                     "writeonly": "false"
                 }
             ],
-            "title": "Datastream"
+            "title": "State"
         },
         {
             "@id": "vocab:Drone",
@@ -134,7 +106,7 @@ doc = {
             "description": "Class for a drone",
             "supportedOperation": [
                 {
-                    "@type": "hydra:Operation",
+                    "@type": "http://schema.org/FindAction",
                     "expects": "null",
                     "method": "GET",
                     "possibleStatus": [
@@ -230,12 +202,158 @@ doc = {
             "title": "Drone"
         },
         {
+            "@id": "vocab:Command",
+            "@type": "hydra:Class",
+            "description": "Class for drone commands",
+            "supportedOperation": [
+                {
+                    "@type": "http://schema.org/FindAction",
+                    "expects": "null",
+                    "method": "GET",
+                    "possibleStatus": [
+                        {
+                            "description": "Command not found",
+                            "statusCode": 404
+                        },
+                        {
+                            "description": "Command Returned",
+                            "statusCode": 200
+                        }
+                    ],
+                    "returns": "vocab:Command",
+                    "title": "GetCommand"
+                },
+                {
+                    "@type": "http://schema.org/AddAction",
+                    "expects": "vocab:Command",
+                    "method": "PUT",
+                    "possibleStatus": [
+                        {
+                            "description": "Command added",
+                            "statusCode": 201
+                        }
+                    ],
+                    "returns": "null",
+                    "title": "AddCommand"
+                },
+                {
+                    "@type": "http://schema.org/DeleteAction",
+                    "expects": "null",
+                    "method": "DELETE",
+                    "possibleStatus": [
+                        {
+                            "description": "Command deleted",
+                            "statusCode": 200
+                        }
+                    ],
+                    "returns": "null",
+                    "title": "DeleteCommand"
+                }
+            ],
+            "supportedProperty": [
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/identifier",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "DroneID",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "vocab:State",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "State",
+                    "writeonly": "false"
+                }
+            ],
+            "title": "Command"
+        },
+        {
+            "@id": "vocab:Datastream",
+            "@type": "hydra:Class",
+            "description": "Class for a data entry from drone sensors",
+            "supportedOperation": [
+                {
+                    "@type": "http://schema.org/FindAction",
+                    "expects": "null",
+                    "method": "GET",
+                    "possibleStatus": [
+                        {
+                            "description": "Datastream not found",
+                            "statusCode": 404
+                        },
+                        {
+                            "description": "Datastream returned",
+                            "statusCode": 200
+                        }
+                    ],
+                    "returns": "vocab:Datastream",
+                    "title": "GetDatastream"
+                },
+                {
+                    "@type": "http://schema.org/UpdateAction",
+                    "expects": "vocab:Datastream",
+                    "method": "POST",
+                    "possibleStatus": [
+                        {
+                            "description": "Datastream updated",
+                            "statusCode": 200
+                        }
+                    ],
+                    "returns": "null",
+                    "title": "UpdateDatastream"
+                },
+                {
+                    "@type": "http://schema.org/AddAction",
+                    "expects": "vocab:Datastream",
+                    "method": "PUT",
+                    "possibleStatus": [
+                        {
+                            "description": "Datastream added",
+                            "statusCode": 200
+                        }
+                    ],
+                    "returns": "null",
+                    "title": "AddDatastream"
+                }
+            ],
+            "supportedProperty": [
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/QuantitativeValue",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "Temperature",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/identifier",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "DroneID",
+                    "writeonly": "false"
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "http://schema.org/geo",
+                    "readonly": "false",
+                    "required": "true",
+                    "title": "Position",
+                    "writeonly": "false"
+                }
+            ],
+            "title": "Datastream"
+        },
+        {
             "@id": "vocab:Anomaly",
             "@type": "hydra:Class",
             "description": "Class for Temperature anomalies that need to be confirmed",
             "supportedOperation": [
                 {
-                    "@type": "hydra:Operation",
+                    "@type": "http://schema.org/FindAction",
                     "expects": "null",
                     "method": "GET",
                     "possibleStatus": [
@@ -315,124 +433,6 @@ doc = {
             "title": "Anomaly"
         },
         {
-            "@id": "vocab:Command",
-            "@type": "hydra:Class",
-            "description": "Class for drone commands",
-            "supportedOperation": [
-                {
-                    "@type": "hydra:Operation",
-                    "expects": "null",
-                    "method": "GET",
-                    "possibleStatus": [
-                        {
-                            "description": "Command not found",
-                            "statusCode": 404
-                        },
-                        {
-                            "description": "Command Returned",
-                            "statusCode": 200
-                        }
-                    ],
-                    "returns": "vocab:Command",
-                    "title": "GetCommand"
-                },
-                {
-                    "@type": "http://schema.org/AddAction",
-                    "expects": "vocab:Command",
-                    "method": "PUT",
-                    "possibleStatus": [
-                        {
-                            "description": "Command added",
-                            "statusCode": 201
-                        }
-                    ],
-                    "returns": "null",
-                    "title": "AddCommand"
-                },
-                {
-                    "@type": "http://schema.org/DeleteAction",
-                    "expects": "null",
-                    "method": "DELETE",
-                    "possibleStatus": [
-                        {
-                            "description": "Command deleted",
-                            "statusCode": 200
-                        }
-                    ],
-                    "returns": "null",
-                    "title": "DeleteCommand"
-                }
-            ],
-            "supportedProperty": [
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/identifier",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "DroneID",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "vocab:State",
-                    "readonly": "false",
-                    "required": "true",
-                    "title": "State",
-                    "writeonly": "false"
-                }
-            ],
-            "title": "Command"
-        },
-        {
-            "@id": "vocab:State",
-            "@type": "hydra:Class",
-            "description": "Class for drone state objects",
-            "supportedOperation": [],
-            "supportedProperty": [
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://auto.schema.org/speed",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Speed",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/geo",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Position",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/Property",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Direction",
-                    "writeonly": "false"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "http://schema.org/fuelCapacity",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Battery",
-                    "writeonly": "true"
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "https://schema.org/status",
-                    "readonly": "true",
-                    "required": "false",
-                    "title": "Status",
-                    "writeonly": "false"
-                }
-            ],
-            "title": "State"
-        },
-        {
             "@id": "http://www.w3.org/ns/hydra/core#Collection",
             "@type": "hydra:Class",
             "description": "null",
@@ -465,7 +465,7 @@ doc = {
             "supportedOperation": [
                 {
                     "@id": "_:command_collection_retrieve",
-                    "@type": "hydra:Operation",
+                    "@type": "http://schema.org/FindAction",
                     "description": "Retrieves all Command entities",
                     "expects": "null",
                     "method": "GET",
@@ -507,7 +507,7 @@ doc = {
             "supportedOperation": [
                 {
                     "@id": "_:entry_point",
-                    "@type": "hydra:Operation",
+                    "@type": "http://schema.org/FindAction",
                     "description": "The APIs main entry point.",
                     "expects": "null",
                     "method": "GET",
@@ -516,72 +516,6 @@ doc = {
                 }
             ],
             "supportedProperty": [
-                {
-                    "hydra:description": "The Datastream Class",
-                    "hydra:title": "datastream",
-                    "property": {
-                        "@id": "vocab:EntryPoint/Datastream",
-                        "@type": "hydra:Link",
-                        "description": "Class for a data entry from drone sensors",
-                        "domain": "vocab:EntryPoint",
-                        "label": "Datastream",
-                        "range": "vocab:Datastream",
-                        "supportedOperation": [
-                            {
-                                "@id": "_:getdatastream",
-                                "@type": "hydra:Operation",
-                                "description": "null",
-                                "expects": "null",
-                                "label": "GetDatastream",
-                                "method": "GET",
-                                "returns": "vocab:Datastream",
-                                "statusCodes": [
-                                    {
-                                        "description": "Datastream not found",
-                                        "statusCode": 404
-                                    },
-                                    {
-                                        "description": "Datastream returned",
-                                        "statusCode": 200
-                                    }
-                                ]
-                            },
-                            {
-                                "@id": "_:updatedatastream",
-                                "@type": "hydra:Operation",
-                                "description": "null",
-                                "expects": "vocab:Datastream",
-                                "label": "UpdateDatastream",
-                                "method": "POST",
-                                "returns": "null",
-                                "statusCodes": [
-                                    {
-                                        "description": "Datastream updated",
-                                        "statusCode": 200
-                                    }
-                                ]
-                            },
-                            {
-                                "@id": "_:adddatastream",
-                                "@type": "hydra:Operation",
-                                "description": "null",
-                                "expects": "vocab:Datastream",
-                                "label": "AddDatastream",
-                                "method": "PUT",
-                                "returns": "null",
-                                "statusCodes": [
-                                    {
-                                        "description": "Datastream added",
-                                        "statusCode": 200
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    "readonly": "true",
-                    "required": "null",
-                    "writeonly": "false"
-                },
                 {
                     "hydra:description": "The Drone Class",
                     "hydra:title": "drone",
@@ -594,8 +528,8 @@ doc = {
                         "range": "vocab:Drone",
                         "supportedOperation": [
                             {
-                                "@id": "_:getdrone",
-                                "@type": "hydra:Operation",
+                                "@id": "getdrone",
+                                "@type": "http://schema.org/FindAction",
                                 "description": "null",
                                 "expects": "null",
                                 "label": "GetDrone",
@@ -613,8 +547,8 @@ doc = {
                                 ]
                             },
                             {
-                                "@id": "_:updatedrone",
-                                "@type": "hydra:Operation",
+                                "@id": "updatedrone",
+                                "@type": "http://schema.org/UpdateAction",
                                 "description": "null",
                                 "expects": "vocab:Drone",
                                 "label": "UpdateDrone",
@@ -628,8 +562,8 @@ doc = {
                                 ]
                             },
                             {
-                                "@id": "_:adddrone",
-                                "@type": "hydra:Operation",
+                                "@id": "adddrone",
+                                "@type": "http://schema.org/AddAction",
                                 "description": "null",
                                 "expects": "vocab:Drone",
                                 "label": "AddDrone",
@@ -638,6 +572,72 @@ doc = {
                                 "statusCodes": [
                                     {
                                         "description": "Drone added",
+                                        "statusCode": 200
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "readonly": "true",
+                    "required": "null",
+                    "writeonly": "false"
+                },
+                {
+                    "hydra:description": "The Datastream Class",
+                    "hydra:title": "datastream",
+                    "property": {
+                        "@id": "vocab:EntryPoint/Datastream",
+                        "@type": "hydra:Link",
+                        "description": "Class for a data entry from drone sensors",
+                        "domain": "vocab:EntryPoint",
+                        "label": "Datastream",
+                        "range": "vocab:Datastream",
+                        "supportedOperation": [
+                            {
+                                "@id": "getdatastream",
+                                "@type": "http://schema.org/FindAction",
+                                "description": "null",
+                                "expects": "null",
+                                "label": "GetDatastream",
+                                "method": "GET",
+                                "returns": "vocab:Datastream",
+                                "statusCodes": [
+                                    {
+                                        "description": "Datastream not found",
+                                        "statusCode": 404
+                                    },
+                                    {
+                                        "description": "Datastream returned",
+                                        "statusCode": 200
+                                    }
+                                ]
+                            },
+                            {
+                                "@id": "updatedatastream",
+                                "@type": "http://schema.org/UpdateAction",
+                                "description": "null",
+                                "expects": "vocab:Datastream",
+                                "label": "UpdateDatastream",
+                                "method": "POST",
+                                "returns": "null",
+                                "statusCodes": [
+                                    {
+                                        "description": "Datastream updated",
+                                        "statusCode": 200
+                                    }
+                                ]
+                            },
+                            {
+                                "@id": "adddatastream",
+                                "@type": "http://schema.org/AddAction",
+                                "description": "null",
+                                "expects": "vocab:Datastream",
+                                "label": "AddDatastream",
+                                "method": "PUT",
+                                "returns": "null",
+                                "statusCodes": [
+                                    {
+                                        "description": "Datastream added",
                                         "statusCode": 200
                                     }
                                 ]
@@ -660,8 +660,8 @@ doc = {
                         "range": "vocab:Anomaly",
                         "supportedOperation": [
                             {
-                                "@id": "_:getanomaly",
-                                "@type": "hydra:Operation",
+                                "@id": "getanomaly",
+                                "@type": "http://schema.org/FindAction",
                                 "description": "null",
                                 "expects": "null",
                                 "label": "GetAnomaly",
@@ -679,8 +679,8 @@ doc = {
                                 ]
                             },
                             {
-                                "@id": "_:addanomaly",
-                                "@type": "hydra:Operation",
+                                "@id": "addanomaly",
+                                "@type": "http://schema.org/AddAction",
                                 "description": "null",
                                 "expects": "vocab:Anomaly",
                                 "label": "AddAnomaly",
@@ -694,8 +694,8 @@ doc = {
                                 ]
                             },
                             {
-                                "@id": "_:updateanomaly",
-                                "@type": "hydra:Operation",
+                                "@id": "updateanomaly",
+                                "@type": "http://schema.org/UpdateAction",
                                 "description": "null",
                                 "expects": "vocab:Anomaly",
                                 "label": "UpdateAnomaly",
@@ -726,8 +726,8 @@ doc = {
                         "range": "vocab:CommandCollection",
                         "supportedOperation": [
                             {
-                                "@id": "_:_:command_collection_retrieve",
-                                "@type": "hydra:Operation",
+                                "@id": "_:command_collection_retrieve",
+                                "@type": "http://schema.org/FindAction",
                                 "description": "Retrieves all Command entities",
                                 "expects": "null",
                                 "method": "GET",
@@ -735,7 +735,7 @@ doc = {
                                 "statusCodes": []
                             },
                             {
-                                "@id": "_:_:command_create",
+                                "@id": "_:command_create",
                                 "@type": "http://schema.org/AddAction",
                                 "description": "Create new Command entitity",
                                 "expects": "vocab:Command",

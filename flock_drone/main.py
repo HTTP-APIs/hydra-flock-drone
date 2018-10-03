@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 from hydrus.data.db_models import Base
 from flock_drone.settings import DB_URL, PORT, HYDRUS_SERVER_URL, API_NAME
 from flock_drone.api_docs.doc import doc
-from gevent.wsgi import WSGIServer
+from gevent.pywsgi import WSGIServer
 
 
 if __name__ == "__main__":
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     print("Done")
 
-    apidoc = doc_maker.createDoc(doc, HYDRUS_SERVER_URL, API_NAME)
+    apidoc = doc_maker.create_doc(doc, HYDRUS_SERVER_URL, API_NAME)
 
     session = sessionmaker(bind=engine)()
 
