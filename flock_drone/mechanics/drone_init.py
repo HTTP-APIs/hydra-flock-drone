@@ -81,13 +81,13 @@ def init_drone():
     drone_id = drone["DroneID"]
 
     # If drone has default negative id initialize else remove old drone and then inintialize.
-    if int(drone_id) == -1000:
-        drone_id = int(add_drone(drone))
+    if drone_id == -1000:
+        drone_id = add_drone(drone)
     else:
         # Remove old drone
         remove_drone(drone_id)
         print("Previous drone successfully deleted from the central server.")
-        drone_id = int(add_drone(drone))
+        drone_id = add_drone(drone)
 
     # Update the drone at localhost
     drone["DroneID"] = drone_id

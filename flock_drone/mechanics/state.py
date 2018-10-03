@@ -28,7 +28,7 @@ def gen_State(drone_id, battery, direction, position, status, speed):
 def update_state(state):
     """Update the drone state on drone server."""
     drone = get_drone()
-    if int(drone["DroneID"]) == state["DroneID"]:
+    if drone["DroneID"] == state["DroneID"]:
         # Remove the DroneID key from state
         state.pop("DroneID", None)
 

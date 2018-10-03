@@ -47,7 +47,7 @@ def handle_drone_commands(drone):
         matchObj = re.match(regex, id_)
         if matchObj:
             command_id = matchObj.group(2)
-            temp_list.append(int(command_id))
+            temp_list.append(command_id)
     temp_list.sort()
 
     if len(temp_list) > 0:
