@@ -43,7 +43,7 @@ def handle_drone_commands(drone):
     command_identifiers = [x["@id"] for x in commands]
     temp_list = list()
     for id_ in command_identifiers:
-        regex = r'/(.*)/(\d*)'
+        regex = r'/(.*)/(.*)'
         matchObj = re.match(regex, id_)
         if matchObj:
             command_id = matchObj.group(2)
