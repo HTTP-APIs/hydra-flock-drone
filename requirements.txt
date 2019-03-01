@@ -11,8 +11,10 @@ gevent==1.2.2
 greenlet==0.4.12
 haversine==0.4.5
 httplib2==0.10.3
--e git://github.com/andrejsab/hydra-py.git@ff78005b3ff1902e53b6faacff17498d105cd80a#egg=hydra
--e git://github.com/HTTP-APIs/hydrus.git@9d9f68d37ff961496ac31d0e774086429665409e#egg=hydrus
+-e git://github.com/HTTP-APIs/hydra-openapi-parser.git#egg=hydra-openapi-parser
+-e git://github.com/pchampin/hydra-py.git#egg=hydra
+-e git://github.com/HTTP-APIs/hydrus.git#egg=hydrus
+-e git://github.com/HTTP-APIs/hydra-python-core.git#egg=hydra_python_core
 idna==2.5
 isodate==0.5.4
 itsdangerous==0.24
