@@ -12,7 +12,7 @@ import os
 import sys
 import json
 from flock_drone.settings import HYDRUS_SERVER_URL
-from hydrus.hydraspec.doc_writer import HydraDoc, HydraClass, HydraClassProp, HydraClassOp
+from hydra_python_core.doc_writer import HydraDoc, HydraClass, HydraClassProp, HydraClassOp
 
 
 def doc_gen(API, BASE_URL):
