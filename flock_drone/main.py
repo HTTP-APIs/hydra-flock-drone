@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     print("Done")
 
-    apidoc = doc_maker.createDoc(doc, HYDRUS_SERVER_URL, API_NAME)
+    apidoc = doc_maker.create_doc(doc, HYDRUS_SERVER_URL, API_NAME)
 
     session = sessionmaker(bind=engine)()
 
