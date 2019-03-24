@@ -481,7 +481,7 @@ doc = {
                     "returns": "vocab:Command",
                     "statusCodes": [
                         {
-                            "description": "If the Command entity was created successfully.",
+                            "description": "If the Command entity was createdsuccessfully.",
                             "statusCode": 201
                         }
                     ]
@@ -743,7 +743,7 @@ doc = {
                                 "returns": "vocab:Command",
                                 "statusCodes": [
                                     {
-                                        "description": "If the Command entity was created successfully.",
+                                        "description": "If the Command entity was createdsuccessfully.",
                                         "statusCode": 201
                                     }
                                 ]
