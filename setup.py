@@ -30,7 +30,7 @@ setup(name='hydra-flock-drone',
                         'thespian==3.5.2',
                         'uritemplate==3.0.0',
                         'uWSGI==2.0.13.1',
-                        'Werkzeug==0.12.2',
+                        'Werkzeug==0.15.3',
                         'rdflib-jsonld==0.4.0',
                         'requests==2.18.1',
                         'haversine==0.4.5']

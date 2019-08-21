@@ -35,4 +35,4 @@ thespian==3.5.2
 uritemplate==3.0.0
 urllib3==1.21.1
 uWSGI==2.0.13.1
-Werkzeug==0.12.2
+Werkzeug==0.15.3
