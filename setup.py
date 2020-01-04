@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+try:  # for pip >= 10
+    from pip._internal.req import parse_requirements
+    from pip._internal.download import PipSession
+except ImportError:  # for pip <= 9.0.3
+    from pip.req import parse_requirements
+    from pip.download import PipSession
+
+
+install_requires = parse_requirements('requirements.txt', session=PipSession())
+dependencies = [str(package.req) for package in install_requires]
 
 setup(name='hydra-flock-drone',
       version='0.0.1',
@@ -8,30 +18,5 @@ setup(name='hydra-flock-drone',
       author='W3C HYDRA development group',
       author_email='collective@hydraecosystem.org',
       url='https://github.com/HTTP-APIs/hydra-flock-demo',
-      install_requires=['aniso8601==1.2.1',
-                        'appdirs==1.4.3',
-                        'click==6.7',
-                        'Flask==1.0',
-                        'Flask-Cors==3.0.3',
-                        'Flask-RESTful==0.3.6',
-                        'gevent==1.2.2',
-                        'greenlet==0.4.12',
-                        'httplib2==0.10.3',
-                        'isodate==0.5.4',
-                        'packaging==16.8',
-                        'persisting-theory==0.2.1',
-                        'psycopg2==2.7.1',
-                        'pyparsing==2.2.0',
-                        'python-dateutil==2.6.0',
-                        'pytz==2017.2',
-                        'rdflib==4.2.2',
-                        'six==1.10.0',
-                        'SQLAlchemy==1.1.10',
-                        'thespian==3.5.2',
-                        'uritemplate==3.0.0',
-                        'uWSGI==2.0.13.1',
-                        'Werkzeug==0.15.3',
-                        'rdflib-jsonld==0.4.0',
-                        'requests==2.20.0',
-                        'haversine==0.4.5']
+      install_requires=dependencies
       )
